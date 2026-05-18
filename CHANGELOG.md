@@ -9,8 +9,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- CopilotKit AI copilot sidebar — an agent that operates the canvas, not just talks about it
+- LangGraph Python agent (`apps/agent/`) with multi-LLM support (Anthropic, OpenAI, Gemini)
+- BFF server (`apps/bff/`) — CopilotKit Runtime endpoint + LLM proxy with CORS support
+- 12 frontend tools the agent can call: create/branch/merge/delete/update/focus nodes, append messages, highlight findings, render previews/proposals/plans/charts
+- Generative UI components inline in copilot chat: branch proposals, merge plans, node previews, charts (pie/bar/line via Recharts)
+- Real-time canvas-to-agent state synchronization (debounced 80 ms)
+- `npm run dev:copilot` — single command to launch frontend + BFF + agent concurrently
+- CI: Python test job (pytest, Python 3.11/3.12/3.13 matrix) in parallel with Node job
+- Release: PyPI publishing for agent package via OIDC trusted publishing (`agent-v*` tags)
+- Google Gemini LLM provider support in the agent
 - Color tags and labels on chat nodes — palette picker with 8 colors and custom text labels (#16)
 - Copy-to-clipboard button on chat messages (#15)
+
+### Changed
+
+- Architecture expanded from browser-only to optional client-server with BFF and agent
+- CI job renamed from `build` to `node` for clarity
 
 ### Fixed
 

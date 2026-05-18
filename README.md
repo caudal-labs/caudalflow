@@ -3,17 +3,20 @@
   <img src="https://img.shields.io/badge/TypeScript-5.9-3178C6?style=flat-square&logo=typescript&logoColor=white" />
   <img src="https://img.shields.io/badge/Vite-8-646CFF?style=flat-square&logo=vite&logoColor=white" />
   <img src="https://img.shields.io/badge/Tailwind-4-06B6D4?style=flat-square&logo=tailwindcss&logoColor=white" />
+  <img src="https://img.shields.io/badge/Python-3.11+-3776AB?style=flat-square&logo=python&logoColor=white" />
+  <img src="https://img.shields.io/badge/LangGraph-0.2+-1C3C3C?style=flat-square&logo=langchain&logoColor=white" />
+  <img src="https://img.shields.io/badge/CopilotKit-1.57+-000000?style=flat-square" />
   <img src="https://img.shields.io/badge/License-MIT-green?style=flat-square" />
 </p>
 
 <h1 align="center">CaudalFlow</h1>
 
 <p align="center">
-  <strong>Every idea deserves a side quest. Branch, compare, merge.</strong>
+  <strong>Every idea deserves a side quest. Branch, compare, merge — with an AI copilot that operates the canvas.</strong>
 </p>
 
 <p align="center">
-  CaudalFlow is a visual canvas for AI conversations that lets you branch, explore, and merge ideas like a mind map — powered by LLMs.
+  CaudalFlow is a visual canvas for AI conversations that lets you branch, explore, and merge ideas like a mind map — powered by LLMs. An optional AI copilot can create nodes, propose branches, plan merges, and render charts directly in the conversation.
 </p>
 
 <p align="center">
@@ -38,6 +41,21 @@ It's how research actually works: diverge, explore, converge.
 
 ## Features
 
+### AI Copilot
+
+A CopilotKit-powered sidebar with a LangGraph agent that doesn't just talk about your canvas — it operates it. The copilot can create nodes, branch conversations, merge threads, highlight findings, and delete nodes on your behalf. It sees the full canvas state in real time and reasons about your workspace before acting.
+
+The copilot exposes 12 tools to the agent: `createChatNode`, `createBranchFromNode`, `mergeChatNodes`, `appendNodeMessage`, `deleteChatNode`, `updateChatNode`, `focusChatNode`, `highlightWorkspaceFinding`, and four generative UI renders.
+
+### Generative UI
+
+The copilot renders rich, interactive cards inline in the chat:
+
+- **Branch proposals** — the agent explains why a branch would be useful, with suggested topics
+- **Merge plans** — a preview of which nodes will be merged and the rationale, before the merge happens
+- **Node previews** — a summary card for any node, with a button to focus the viewport on it
+- **Charts** — pie, bar, and line charts rendered with Recharts, driven by the agent's analysis
+
 ### Infinite Conversation Canvas
 
 Create chat nodes anywhere on an infinite, pannable, zoomable canvas. Each node is a full AI conversation with streaming responses, markdown rendering, and syntax highlighting.
@@ -58,6 +76,7 @@ Plug in your preferred AI backend:
 |----------|--------|--------|
 | **Anthropic** | Claude Sonnet, Opus, Haiku | Supported |
 | **OpenAI** | GPT-4o, GPT-4o-mini, o1, etc. | Supported |
+| **Google Gemini** | Gemini models (agent only) | Supported |
 | **Mock** | Simulated responses | Built-in (for development) |
 
 Adding a new provider is four files and zero changes to the rest of the app — see the [Contributing Guide](CONTRIBUTING.md).
@@ -88,11 +107,40 @@ Organize your explorations into separate workspaces. Each workspace persists its
 npx caudalflow
 ```
 
-That's it — opens in your browser, runs entirely on your machine. Your API keys never leave localhost.
+That's it — opens in your browser, runs entirely on your machine. Works out of the box with the mock provider; plug in an API key in Settings for real LLM responses.
 
-### Development Setup
+### With AI Copilot
 
-**Prerequisites:** Node.js 18+, an API key from [Anthropic](https://console.anthropic.com/) or [OpenAI](https://platform.openai.com/) (optional — mock mode works out of the box)
+To run the full stack (frontend + BFF + LangGraph agent):
+
+```bash
+git clone https://github.com/caudal-labs/caudalflow.git
+cd caudalflow
+npm install
+npm run install:agent   # creates Python venv, installs agent deps
+```
+
+Create `apps/agent/.env` with at least one LLM key:
+
+```env
+ANTHROPIC_API_KEY=sk-ant-...
+# and/or
+OPENAI_API_KEY=sk-...
+# and/or
+GOOGLE_API_KEY=...
+```
+
+Then launch everything with a single command:
+
+```bash
+npm run dev:copilot
+```
+
+This starts the Vite dev server, the Hono BFF, and the LangGraph agent concurrently. Open **http://localhost:5173** and click the copilot sidebar to start.
+
+### Development Setup (canvas only)
+
+**Prerequisites:** Node.js 20+, an API key from [Anthropic](https://console.anthropic.com/) or [OpenAI](https://platform.openai.com/) (optional — mock mode works out of the box)
 
 ```bash
 git clone https://github.com/caudal-labs/caudalflow.git
@@ -110,7 +158,7 @@ Open **http://localhost:5173** — you're in. The mock provider is active by def
 3. Paste your API key
 4. Start chatting — responses stream in real-time
 
-> **Your keys stay on your machine.** CaudalFlow runs entirely in your browser — API keys are stored in localStorage and sent directly to the provider. There is no backend, no server, no third party in between.
+> **Your keys stay on your machine.** In browser-only mode, API keys are stored in localStorage and sent directly to the provider. With the copilot stack, keys live in your local `.env` and go through your local BFF — never a third-party server.
 
 ---
 
@@ -142,6 +190,16 @@ When you Shift-drag to select 2+ nodes and submit an action:
 
 This is the killer feature — it lets you run parallel research threads and then converge them into a single, informed analysis.
 
+### AI Copilot
+
+The copilot sidebar connects the frontend to a LangGraph Python agent through a Hono BFF:
+
+1. **State sync** — the frontend subscribes to `flowStore`, `chatStore`, and `workspaceStore` and pushes a snapshot to the agent on every change (debounced 80 ms, deduplicated by JSON serialization)
+2. **Tool calls** — the agent calls frontend tools (`createChatNode`, `mergeChatNodes`, etc.) that directly mutate the Zustand stores
+3. **Generative UI** — four render tools return React components (branch proposals, merge plans, node previews, charts) that appear inline in the copilot chat
+
+The agent sees: active workspace, all nodes and edges, conversations (with message limits to fit context windows), selected nodes, merge context, and current LLM config.
+
 ### State Management
 
 Four Zustand stores keep things clean:
@@ -160,28 +218,50 @@ Everything persists to localStorage with debounced auto-save.
 ## Architecture
 
 ```
-┌─────────────────────────────────────────────┐
-│                   Canvas                     │
-│  ┌──────────┐  ┌──────────┐  ┌──────────┐  │
-│  │ ChatNode │──│ ChatNode │──│ ChatNode │  │
-│  │ (parent) │  │ (branch) │  │ (merge)  │  │
-│  └──────────┘  └──────────┘  └──────────┘  │
-└──────────────────┬──────────────────────────┘
-                   │
-       ┌───────────┼───────────┐
-       ▼           ▼           ▼
-  ┌─────────┐ ┌─────────┐ ┌─────────┐
-  │flowStore│ │chatStore│ │settings │
-  └────┬────┘ └────┬────┘ └────┬────┘
-       │           │           │
-       ▼           ▼           ▼
-  ┌──────────────────────────────────┐
-  │         LLM Service Layer        │
-  │  ┌──────────┬──────────┬──────┐  │
-  │  │Anthropic │  OpenAI  │ Mock │  │
-  │  └──────────┴──────────┴──────┘  │
-  └──────────────────────────────────┘
+┌──────────────────────────────────────────────────────┐
+│                     Frontend                          │
+│  ┌──────────┐  ┌──────────┐  ┌──────────┐           │
+│  │ ChatNode │──│ ChatNode │──│ ChatNode │           │
+│  │ (parent) │  │ (branch) │  │ (merge)  │           │
+│  └──────────┘  └──────────┘  └──────────┘           │
+│                                                      │
+│  ┌───────────┐ ┌───────────┐ ┌───────────┐          │
+│  │ flowStore │ │ chatStore │ │ settings  │          │
+│  └─────┬─────┘ └─────┬─────┘ └─────┬─────┘          │
+│        └──────────────┼─────────────┘                │
+│                       ▼                              │
+│         ┌──────────────────────┐                     │
+│         │  CopilotKit Bridge   │ ← 12 frontend tools │
+│         │  (state sync 80 ms)  │ ← generative UI     │
+│         └──────────┬───────────┘                     │
+│                    │                                 │
+│  ┌─────────────────┼──────────────────┐              │
+│  │     LLM Service Layer (direct)     │              │
+│  │  ┌──────────┬──────────┬────────┐  │              │
+│  │  │Anthropic │  OpenAI  │  Mock  │  │              │
+│  │  └──────────┴──────────┴────────┘  │              │
+│  └────────────────────────────────────┘              │
+└──────────────────────┬───────────────────────────────┘
+                       │ /api/copilotkit
+                       ▼
+            ┌─────────────────────┐
+            │    BFF (Hono)       │
+            │  CopilotKit Runtime │
+            │  + LLM proxy        │
+            └──────────┬──────────┘
+                       │
+                       ▼
+            ┌─────────────────────┐
+            │  LangGraph Agent    │
+            │  (Python)           │
+            │  ┌───────┬────────┐ │
+            │  │Claude │ GPT-4o │ │
+            │  │Gemini │  ...   │ │
+            │  └───────┴────────┘ │
+            └─────────────────────┘
 ```
+
+The canvas works standalone in the browser (direct LLM calls, no backend needed). The BFF and agent are optional — they power the copilot sidebar.
 
 ### Provider System
 
@@ -208,24 +288,61 @@ Providers are registered at startup and selected at runtime. The rest of the app
 | Styling | Tailwind CSS 4 |
 | Canvas | @xyflow/react 12 |
 | State | Zustand 5 |
+| Copilot | CopilotKit 1.57 |
+| Charts | Recharts 3 |
+| BFF | Hono 4 |
+| Agent | Python 3.11+, LangGraph, LangChain |
 | Markdown | react-markdown + remark-gfm |
 | Code Highlighting | react-syntax-highlighter (Prism) |
 | Icons | Lucide React |
 | IDs | nanoid |
 
-Zero backend. Zero database. Runs entirely in your browser.
+Runs in the browser — or with the full copilot stack.
 
 ---
 
 ## Development
 
 ```bash
-npm run dev        # Dev server with HMR
-npm run build      # Type-check + production build
-npm run lint       # ESLint
-npm test           # Run unit tests
-npm run test:watch # Tests in watch mode
-npm run preview    # Preview production build
+# Canvas only
+npm run dev            # Dev server with HMR
+npm run build          # Type-check + production build
+npm run lint           # ESLint
+npm test               # Run unit tests
+npm run test:watch     # Tests in watch mode
+npm run preview        # Preview production build
+
+# Copilot stack
+npm run dev:copilot    # Launch frontend + BFF + agent concurrently
+npm run dev:ui         # Frontend only (alias for dev)
+npm run dev:bff        # BFF server (Hono, port 4000)
+npm run dev:agent      # LangGraph agent (port 8133)
+npm run install:agent  # Create Python venv + install agent deps
+```
+
+### Project Structure
+
+```
+src/
+├── components/
+│   ├── canvas/        # Canvas, CanvasControls, MergeSelectionPopup
+│   ├── copilot/       # CopilotKitProviderShell, CanvasCopilotBridge,
+│   │                  # BranchProposalCard, ChartRenderer, canvasAgentState
+│   ├── nodes/         # ChatNode, ChatMessage, ChatInput, SelectionPopup
+│   ├── edges/         # TopicEdge (custom edge renderer)
+│   └── ui/            # SettingsPanel, HelpGuide, WorkspaceSelector
+├── hooks/             # useChatNode (core chat logic), usePersistence
+├── stores/            # flowStore, chatStore, settingsStore, workspaceStore
+├── services/
+│   ├── llm.ts         # Streaming orchestrator
+│   └── providers/     # LLM providers: mock, openai, anthropic
+├── types/             # chat.ts, flow.ts, workspace.ts
+└── utils/             # systemPrompts.ts, nodeLayout.ts
+
+apps/
+├── agent/             # Python LangGraph agent (multi-LLM, CopilotKit SDK)
+├── bff/               # Hono BFF — CopilotKit Runtime + LLM proxy
+└── mcp/               # Reserved for MCP integration
 ```
 
 ### Adding a Provider
