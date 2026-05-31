@@ -85,17 +85,36 @@ Adding a new provider is four files and zero changes to the rest of the app — 
 
 Organize your explorations into separate workspaces. Each workspace persists its full state — nodes, edges, conversations, positions — to localStorage. Export and import workspaces as JSON files.
 
-### Keyboard-Driven Workflow
+### Theme System
+
+Switch between light, dark, and system themes. The theme is applied consistently across all components using CSS variables. Theme preference is saved to localStorage.
+
+- **Dark theme** — deep dark background with high contrast
+- **Light theme** — clean white background for bright environments
+- **System** — automatically follows your OS theme setting
+
+### Internationalization (i18n)
+
+Full support for English and Chinese languages. All UI text, tooltips, and messages are internationalized. Language preference is saved to localStorage.
+
+### Node Interactions
 
 | Action | How |
 |--------|-----|
 | New node | Double-click canvas or `+` button |
-| Pan canvas | Click & drag |
-| Branch from text | Select text, click **Branch** button |
+| Pan canvas | Hold **Space** + drag |
+| Select node | Click on node |
 | Multi-select nodes | **Shift** + drag |
-| Merge selected nodes | Type action in merge popup |
-| Dismiss popups | **Esc** |
+| Branch from text | Select text, click **Branch** button |
+| Delete node | Press **Delete**/**X** key or click **X** button (with confirmation) |
+| Collapse node | Click collapse button in header |
 | Maximize node | Click maximize in header |
+| Connect nodes | Drag from node handle to another node |
+| Create connected node | Drag from node handle to empty area |
+
+### Tooltips
+
+All toolbar buttons have descriptive tooltips that appear on hover, helping you understand each function.
 
 ---
 
@@ -104,7 +123,7 @@ Organize your explorations into separate workspaces. Each workspace persists its
 **Prerequisites:** Node.js 20+, Python 3.11+, an API key from [Anthropic](https://console.anthropic.com/), [OpenAI](https://platform.openai.com/), or [Google AI](https://ai.google.dev/)
 
 ```bash
-git clone https://github.com/caudal-labs/caudalflow.git
+git clone https://github.com/yancongya/caudalflow.git
 cd caudalflow
 npm install
 npm run install:agent   # creates Python venv, installs agent deps
@@ -178,7 +197,7 @@ Four Zustand stores keep things clean:
 |-------|---------------|
 | `flowStore` | Nodes, edges, graph mutations |
 | `chatStore` | Messages per node, streaming state |
-| `settingsStore` | LLM config, UI preferences |
+| `settingsStore` | LLM config, UI preferences, theme, language |
 | `workspaceStore` | Multi-workspace management |
 
 Everything persists to localStorage with debounced auto-save.
@@ -259,6 +278,7 @@ Providers are registered at startup and selected at runtime. The rest of the app
 | Canvas | @xyflow/react 12 |
 | State | Zustand 5 |
 | Copilot | CopilotKit 1.57 |
+| i18n | react-i18next |
 | Charts | Recharts 3 |
 | BFF | Hono 4 |
 | Agent | Python 3.11+, LangGraph, LangChain |
@@ -302,6 +322,7 @@ src/
 │   ├── edges/         # TopicEdge (custom edge renderer)
 │   └── ui/            # SettingsPanel, HelpGuide, WorkspaceSelector
 ├── hooks/             # useChatNode (core chat logic), usePersistence
+├── i18n/              # Internationalization (en.json, zh.json)
 ├── stores/            # flowStore, chatStore, settingsStore, workspaceStore
 ├── services/
 │   ├── llm.ts         # Streaming orchestrator
@@ -326,6 +347,27 @@ See the [step-by-step guide in CONTRIBUTING.md](CONTRIBUTING.md#adding-a-new-llm
 
 ---
 
+## Changelog
+
+### v2.1.0 (Latest)
+
+- **Theme System** — Light, dark, and system theme support with CSS variables
+- **Internationalization** — Full English and Chinese language support
+- **Custom Chat Panel** — Replaced CopilotKit sidebar with custom dark-themed chat component
+- **Improved Interactions** — Space key to pan, Delete/X key to delete (with confirmation)
+- **Node Collapse** — Collapsed nodes show as small cards, expand on click
+- **Connect to Create** — Drag from node handle to empty area to create connected node
+- **Tooltips** — All toolbar buttons have descriptive hover tooltips
+
+### v2.0.0
+
+- Major rewrite with CopilotKit integration
+- LangGraph agent support
+- Generative UI (branch proposals, merge plans, charts)
+- Multi-workspace support
+
+---
+
 ## Contributing
 
 We welcome contributions! See [CONTRIBUTING.md](CONTRIBUTING.md) for:
@@ -343,5 +385,5 @@ We welcome contributions! See [CONTRIBUTING.md](CONTRIBUTING.md) for:
 ---
 
 <p align="center">
-  Built by <a href="https://github.com/caudal-labs">Caudal Labs</a>
+  Built by <a href="https://github.com/caudal-labs">Caudal Labs</a> | Forked by <a href="https://github.com/yancongya">yancongya</a>
 </p>
