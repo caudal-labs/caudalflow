@@ -17,6 +17,7 @@ import { useSettingsStore } from '../../stores/settingsStore';
 import { useFlowStore } from '../../stores/flowStore';
 import { useChatStore } from '../../stores/chatStore';
 import { HelpGuidePanel } from '../ui/HelpGuide';
+import { Tooltip } from '../ui/Tooltip';
 import { calculateAutoLayoutPositions } from '../../utils/nodeLayout';
 
 export function CanvasControls() {
@@ -95,47 +96,62 @@ export function CanvasControls() {
   return (
     <>
       <div className="absolute top-4 left-4 z-10 flex flex-col gap-1.5">
-        <button onClick={handleNewNode} className={btnClass} title={t('canvas.newChat')}>
-          <Plus size={18} />
-        </button>
+        <Tooltip content={t('canvas.newChat')}>
+          <button onClick={handleNewNode} className={btnClass}>
+            <Plus size={18} />
+          </button>
+        </Tooltip>
         <div className="h-px bg-neutral-700/50 my-0.5" />
-        <button onClick={() => zoomIn()} className={btnClass} title={t('canvas.zoomIn')}>
-          <ZoomIn size={18} />
-        </button>
-        <button onClick={() => zoomOut()} className={btnClass} title={t('canvas.zoomOut')}>
-          <ZoomOut size={18} />
-        </button>
-        <button onClick={() => fitView({ padding: 0.2 })} className={btnClass} title={t('canvas.fitView')}>
-          <Maximize size={18} />
-        </button>
-        <button onClick={handleAutoArrange} className={btnClass} title={t('canvas.autoArrange')}>
-          <Network size={18} />
-        </button>
+        <Tooltip content={t('canvas.zoomIn')}>
+          <button onClick={() => zoomIn()} className={btnClass}>
+            <ZoomIn size={18} />
+          </button>
+        </Tooltip>
+        <Tooltip content={t('canvas.zoomOut')}>
+          <button onClick={() => zoomOut()} className={btnClass}>
+            <ZoomOut size={18} />
+          </button>
+        </Tooltip>
+        <Tooltip content={t('canvas.fitView')}>
+          <button onClick={() => fitView({ padding: 0.2 })} className={btnClass}>
+            <Maximize size={18} />
+          </button>
+        </Tooltip>
+        <Tooltip content={t('canvas.autoArrange')}>
+          <button onClick={handleAutoArrange} className={btnClass}>
+            <Network size={18} />
+          </button>
+        </Tooltip>
         <div className="h-px bg-neutral-700/50 my-0.5" />
-        <button
-          onClick={toggleMinimap}
-          className={`${btnClass} ${showMinimap ? 'text-accent-400' : ''}`}
-          title={t('canvas.toggleMinimap')}
-        >
-          <Map size={18} />
-        </button>
-        <button  
-          onClick={toggleCollapseSmart}
-          className={btnClass}
-          title={t('canvas.toggleCollapse')}
-        >
-          {mostlyCollapsed ? <ChevronUpSquare size={18} /> : <ChevronDownSquare size={18} />}        
-        </button>
-        <button onClick={toggleSettings} className={btnClass} title={t('canvas.settings')}>
-          <Settings size={18} />
-        </button>
-        <button
-          onClick={() => setShowHelp(!showHelp)}
-          className={`${btnClass} ${showHelp ? 'text-accent-400' : ''}`}
-          title={t('canvas.help')}
-        >
-          <HelpCircle size={18} />
-        </button>
+        <Tooltip content={t('canvas.toggleMinimap')}>
+          <button
+            onClick={toggleMinimap}
+            className={`${btnClass} ${showMinimap ? 'text-accent-400' : ''}`}
+          >
+            <Map size={18} />
+          </button>
+        </Tooltip>
+        <Tooltip content={t('canvas.toggleCollapse')}>
+          <button  
+            onClick={toggleCollapseSmart}
+            className={btnClass}
+          >
+            {mostlyCollapsed ? <ChevronUpSquare size={18} /> : <ChevronDownSquare size={18} />}        
+          </button>
+        </Tooltip>
+        <Tooltip content={t('canvas.settings')}>
+          <button onClick={toggleSettings} className={btnClass}>
+            <Settings size={18} />
+          </button>
+        </Tooltip>
+        <Tooltip content={t('canvas.help')}>
+          <button
+            onClick={() => setShowHelp(!showHelp)}
+            className={`${btnClass} ${showHelp ? 'text-accent-400' : ''}`}
+          >
+            <HelpCircle size={18} />
+          </button>
+        </Tooltip>
       </div>
       {showHelp && <HelpGuidePanel />}
     </>
