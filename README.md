@@ -9,6 +9,10 @@
   <img src="https://img.shields.io/badge/License-MIT-green?style=flat-square" />
 </p>
 
+<p align="center">
+  <b>English</b> | <a href="./README_CN.md">中文</a>
+</p>
+
 <h1 align="center">CaudalFlow</h1>
 
 <p align="center">
