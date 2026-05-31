@@ -1,4 +1,5 @@
 import { useState, useCallback, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Send, Square, Paperclip, X } from 'lucide-react';
 import { useChatStore } from '../../stores/chatStore';
 
@@ -15,6 +16,7 @@ export function ChatInput({
   onCancel,
   supportsVision = true,
 }: ChatInputProps) {
+  const { t } = useTranslation();
   const [input, setInput] = useState('');
   const [images, setImages] = useState<File[]>([]);
   const [isDragging, setIsDragging] = useState(false);
@@ -121,7 +123,7 @@ export function ChatInput({
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={handleKeyDown}
           onPaste={handlePaste}
-          placeholder="Ask something..."
+          placeholder={t('chat.askSomething')}
           rows={1}
           className="flex-1 resize-none bg-neutral-800/50 text-sm text-neutral-200 rounded-lg px-3 py-2 placeholder-neutral-500 border border-neutral-700/50 focus:border-accent-500/50 focus:outline-none transition-colors"
           style={{ minHeight: '36px', maxHeight: '100px' }}
@@ -148,8 +150,8 @@ export function ChatInput({
           className="shrink-0 p-2 rounded-lg bg-neutral-800/60 text-neutral-300 hover:bg-neutral-700 transition disabled:opacity-30"
           title={
             supportsVision
-              ? 'Attach image'
-              : 'Images not supported by provider'
+              ? t('chat.attachImage')
+              : t('chat.imagesNotSupported')
           }
         >
           <Paperclip size={16} />

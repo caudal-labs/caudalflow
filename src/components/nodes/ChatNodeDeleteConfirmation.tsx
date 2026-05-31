@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { AlertTriangle, Trash2, X } from 'lucide-react';
 
 interface ChatNodeDeleteConfirmationProps {
@@ -12,6 +13,7 @@ export function ChatNodeDeleteConfirmation({
   onConfirm,
   onCancel,
 }: ChatNodeDeleteConfirmationProps) {
+  const { t } = useTranslation();
   const popupRef = useRef<HTMLDivElement>(null);
   const truncatedTopic = topic.length > 48 ? topic.slice(0, 48) + '...' : topic;
 
@@ -55,10 +57,10 @@ export function ChatNodeDeleteConfirmation({
               id="delete-chat-node-title"
               className="text-xs font-medium text-neutral-200"
             >
-              Delete this chat?
+              {t('delete.deleteChat')}
             </div>
             <p className="mt-1 text-[11px] leading-4 text-neutral-400">
-              This removes &ldquo;{truncatedTopic}&rdquo; and its conversation history.
+              {t('delete.deleteDescription', { topic: truncatedTopic })}
             </p>
           </div>
           <button
@@ -67,8 +69,8 @@ export function ChatNodeDeleteConfirmation({
               onCancel();
             }}
             className="shrink-0 text-neutral-500 hover:text-neutral-200 transition-colors"
-            title="Cancel"
-            aria-label="Cancel delete"
+            title={t('delete.cancel')}
+            aria-label={t('delete.cancel')}
           >
             <X size={12} />
           </button>
@@ -83,7 +85,7 @@ export function ChatNodeDeleteConfirmation({
             onCancel();
           }}
         >
-          Cancel
+          {t('delete.cancel')}
         </button>
         <button
           className="flex items-center gap-1.5 text-xs text-red-300 hover:text-red-200 hover:bg-red-500/10 rounded-md px-2 py-1 transition-colors"
@@ -93,7 +95,7 @@ export function ChatNodeDeleteConfirmation({
           }}
         >
           <Trash2 size={12} />
-          <span>Delete</span>
+          <span>{t('delete.delete')}</span>
         </button>
       </div>
     </div>

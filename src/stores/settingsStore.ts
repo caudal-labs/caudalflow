@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import i18n from '../i18n';
 import type { LLMConfig } from '../types/chat';
 
 interface SettingsState {
@@ -8,12 +9,14 @@ interface SettingsState {
   showSystemPrompts: boolean;
   showSettings: boolean;
   welcomeDismissed: boolean;
+  language: string;
   updateLLMConfig: (config: Partial<LLMConfig>) => void;
   toggleMinimap: () => void;
   toggleSystemPrompts: () => void;
   toggleSettings: () => void;
   setShowSettings: (show: boolean) => void;
   dismissWelcome: () => void;
+  setLanguage: (lang: string) => void;
 }
 
 export const useSettingsStore = create<SettingsState>()(
@@ -32,6 +35,7 @@ export const useSettingsStore = create<SettingsState>()(
       showSystemPrompts: false,
       showSettings: false,
       welcomeDismissed: false,
+      language: 'en',
 
       updateLLMConfig: (config) => {
         const current = get().llmConfig;
@@ -61,6 +65,11 @@ export const useSettingsStore = create<SettingsState>()(
       setShowSettings: (show) => set({ showSettings: show }),
 
       dismissWelcome: () => set({ welcomeDismissed: true }),
+
+      setLanguage: (lang) => {
+        set({ language: lang });
+        i18n.changeLanguage(lang);
+      },
     }),
     {
       name: 'caudalflow-settings',
@@ -69,6 +78,7 @@ export const useSettingsStore = create<SettingsState>()(
         showMinimap: state.showMinimap,
         showSystemPrompts: state.showSystemPrompts,
         welcomeDismissed: state.welcomeDismissed,
+        language: state.language,
       }),
     }
   )

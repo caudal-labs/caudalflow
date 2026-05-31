@@ -1,14 +1,18 @@
+import { useTranslation } from 'react-i18next';
 import { X } from 'lucide-react';
 import { useSettingsStore } from '../../stores/settingsStore';
 import { listProviders } from '../../services/providers/registry';
 
 export function SettingsPanel() {
+  const { t } = useTranslation();
   const showSettings = useSettingsStore((s) => s.showSettings);
   const setShowSettings = useSettingsStore((s) => s.setShowSettings);
   const config = useSettingsStore((s) => s.llmConfig);
   const updateConfig = useSettingsStore((s) => s.updateLLMConfig);
   const showSystemPrompts = useSettingsStore((s) => s.showSystemPrompts);
   const toggleSystemPrompts = useSettingsStore((s) => s.toggleSystemPrompts);
+  const language = useSettingsStore((s) => s.language);
+  const setLanguage = useSettingsStore((s) => s.setLanguage);
   const providers = listProviders();
 
   if (!showSettings) return null;
@@ -20,7 +24,7 @@ export function SettingsPanel() {
   return (
     <div className="absolute top-0 right-0 z-50 h-full w-80 bg-surface-900 border-l border-neutral-700/50 shadow-2xl shadow-black/50 flex flex-col">
       <div className="flex items-center justify-between px-4 py-3 border-b border-neutral-700/50">
-        <h2 className="text-sm font-semibold text-neutral-200">Settings</h2>
+        <h2 className="text-sm font-semibold text-neutral-200">{t('settings.title')}</h2>
         <button
           onClick={() => setShowSettings(false)}
           className="text-neutral-400 hover:text-neutral-200 transition-colors"
@@ -31,7 +35,7 @@ export function SettingsPanel() {
 
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
         <div>
-          <label className={labelClass}>LLM Provider</label>
+          <label className={labelClass}>{t('settings.llmProvider')}</label>
           <select
             value={config.providerId}
             onChange={(e) => updateConfig({ providerId: e.target.value })}
@@ -49,11 +53,11 @@ export function SettingsPanel() {
           <>
             <div>
               <p className="text-xs text-neutral-500">
-                API key is configured on the server (apps/agent/.env).
+                {t('settings.apiKeyConfigured')}
               </p>
             </div>
             <div>
-              <label className={labelClass}>Model</label>
+              <label className={labelClass}>{t('settings.model')}</label>
               <input
                 type="text"
                 value={config.model}
@@ -63,7 +67,7 @@ export function SettingsPanel() {
               />
             </div>
             <div>
-              <label className={labelClass}>Temperature</label>
+              <label className={labelClass}>{t('settings.temperature')}</label>
               <input
                 type="range"
                 min="0"
@@ -80,7 +84,7 @@ export function SettingsPanel() {
               </div>
             </div>
             <div>
-              <label className={labelClass}>Max Tokens</label>
+              <label className={labelClass}>{t('settings.maxTokens')}</label>
               <input
                 type="number"
                 value={config.maxTokens}
@@ -97,11 +101,11 @@ export function SettingsPanel() {
           <>
             <div>
               <p className="text-xs text-neutral-500">
-                API key is configured on the server (apps/agent/.env).
+                {t('settings.apiKeyConfigured')}
               </p>
             </div>
             <div>
-              <label className={labelClass}>Model</label>
+              <label className={labelClass}>{t('settings.model')}</label>
               <input
                 type="text"
                 value={config.model}
@@ -111,7 +115,7 @@ export function SettingsPanel() {
               />
             </div>
             <div>
-              <label className={labelClass}>Temperature</label>
+              <label className={labelClass}>{t('settings.temperature')}</label>
               <input
                 type="range"
                 min="0"
@@ -128,7 +132,7 @@ export function SettingsPanel() {
               </div>
             </div>
             <div>
-              <label className={labelClass}>Max Tokens</label>
+              <label className={labelClass}>{t('settings.maxTokens')}</label>
               <input
                 type="number"
                 value={config.maxTokens}
@@ -143,7 +147,7 @@ export function SettingsPanel() {
 
         {config.providerId === 'mock' && (
           <div>
-            <label className={labelClass}>Token Delay (ms)</label>
+            <label className={labelClass}>{t('settings.tokenDelay')}</label>
             <input
               type="number"
               value={config.mockDelay}
@@ -155,15 +159,15 @@ export function SettingsPanel() {
               max="500"
             />
             <p className="text-xs text-neutral-500 mt-1">
-              Simulated delay between tokens for development mode.
+              {t('settings.tokenDelayDescription')}
             </p>
           </div>
         )}
 
         <div className="border-t border-neutral-700/50 pt-4">
-          <h3 className="text-xs font-semibold text-neutral-300 mb-3">Display</h3>
+          <h3 className="text-xs font-semibold text-neutral-300 mb-3">{t('settings.display')}</h3>
           <label className="flex items-center justify-between cursor-pointer">
-            <span className="text-xs text-neutral-400">Show system prompts</span>
+            <span className="text-xs text-neutral-400">{t('settings.showSystemPrompts')}</span>
             <button
               onClick={toggleSystemPrompts}
               className={`relative w-9 h-5 rounded-full transition-colors ${
@@ -178,14 +182,26 @@ export function SettingsPanel() {
             </button>
           </label>
           <p className="text-[10px] text-neutral-600 mt-1">
-            Show system prompt messages in conversations.
+            {t('settings.showSystemPromptsDescription')}
           </p>
+        </div>
+
+        <div className="border-t border-neutral-700/50 pt-4">
+          <h3 className="text-xs font-semibold text-neutral-300 mb-3">Language</h3>
+          <select
+            value={language}
+            onChange={(e) => setLanguage(e.target.value)}
+            className={inputClass}
+          >
+            <option value="en">English</option>
+            <option value="zh">中文</option>
+          </select>
         </div>
       </div>
 
       <div className="px-4 py-3 border-t border-neutral-700/50">
         <p className="text-[10px] text-neutral-600 text-center">
-          Settings are saved to localStorage
+          {t('settings.savedToLocalStorage')}
         </p>
       </div>
     </div>

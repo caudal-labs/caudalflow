@@ -1,9 +1,11 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { ChevronDown, Plus, Trash2, Download, Upload, Check, Pencil } from 'lucide-react';
 import { useWorkspaceStore } from '../../stores/workspaceStore';
 import { exportWorkspace, importWorkspace } from '../../hooks/usePersistence';
 
 export function WorkspaceSelector() {
+  const { t } = useTranslation();
   const workspaces = useWorkspaceStore((s) => s.workspaces);
   const activeWorkspaceId = useWorkspaceStore((s) => s.activeWorkspaceId);
   const switchWorkspace = useWorkspaceStore((s) => s.switchWorkspace);
@@ -137,13 +139,13 @@ export function WorkspaceSelector() {
               onClick={() => setDropdownOpen((o) => !o)}
               className="flex items-center gap-1.5 text-sm text-neutral-300 hover:text-neutral-100 transition-colors"
             >
-              <span className="max-w-48 truncate">{active?.name ?? 'Workspace'}</span>
+              <span className="max-w-48 truncate">{active?.name ?? t('workspace.defaultName')}</span>
               <ChevronDown size={14} className={`transition-transform ${dropdownOpen ? 'rotate-180' : ''}`} />
             </button>
             <button
               onClick={startEditing}
               className="opacity-0 group-hover/name:opacity-100 p-0.5 text-neutral-500 hover:text-neutral-300 transition-all"
-              title="Rename workspace"
+              title={t('workspace.renameWorkspace')}
             >
               <Pencil size={12} />
             </button>
@@ -166,14 +168,14 @@ export function WorkspaceSelector() {
                   <button
                     onClick={(e) => handleRenameFromDropdown(e, ws.id)}
                     className="opacity-0 group-hover:opacity-100 p-0.5 text-neutral-500 hover:text-neutral-300 transition-all"
-                    title="Rename workspace"
+                    title={t('workspace.renameWorkspace')}
                   >
                     <Pencil size={14} />
                   </button>
                   <button
                     onClick={(e) => handleDelete(e, ws.id)}
                     className="opacity-0 group-hover:opacity-100 p-0.5 text-neutral-500 hover:text-red-400 transition-all"
-                    title="Delete workspace"
+                    title={t('workspace.deleteWorkspace')}
                   >
                     <Trash2 size={14} />
                   </button>
@@ -186,7 +188,7 @@ export function WorkspaceSelector() {
                 className="w-full flex items-center gap-2 px-3 py-2 text-sm text-neutral-400 hover:text-neutral-200 hover:bg-surface-800 transition-colors"
               >
                 <Plus size={14} />
-                <span>New Workspace</span>
+                <span>{t('workspace.newWorkspace')}</span>
               </button>
             </div>
           </div>
@@ -201,14 +203,14 @@ export function WorkspaceSelector() {
         <button
           onClick={exportWorkspace}
           className="p-1.5 text-neutral-500 hover:text-neutral-300 transition-colors"
-          title="Export Workspace"
+          title={t('workspace.exportWorkspace')}
         >
           <Download size={15} />
         </button>
         <button
           onClick={handleImport}
           className="p-1.5 text-neutral-500 hover:text-neutral-300 transition-colors"
-          title="Import Workspace"
+          title={t('workspace.importWorkspace')}
         >
           <Upload size={15} />
         </button>

@@ -1,26 +1,29 @@
+import { useTranslation } from 'react-i18next';
 import { MousePointer2, GitBranch, BoxSelect, Maximize2, Plus, Move } from 'lucide-react';
 
-const shortcuts = [
-  { icon: Plus, label: 'New node', description: 'Double-click on canvas or press + button' },
-  { icon: Move, label: 'Pan canvas', description: 'Click & drag on empty canvas' },
-  { icon: MousePointer2, label: 'Select text', description: 'Highlight text in a conversation, then copy or click Branch to explore' },
-  { icon: GitBranch, label: 'Branch from text', description: 'Select text → click Branch button → type a prompt or click Explore' },
-  { icon: BoxSelect, label: 'Multi-select nodes', description: 'Hold Shift + drag to draw a selection rectangle around 2+ nodes' },
-  { icon: GitBranch, label: 'Merge nodes', description: 'Multi-select 2+ nodes → type an action like "Compare these" in the popup' },
-  { icon: Maximize2, label: 'Maximize node', description: 'Click the maximize button on a node header to fill the viewport' },
-];
-
-const tips = [
-  'Esc closes any open popup',
-  'Merged nodes receive context from all selected parents',
-  'Follow-up messages in branch/merge nodes retain parent context',
-];
-
 export function HelpGuidePanel() {
+  const { t } = useTranslation();
+
+  const shortcuts = [
+    { icon: Plus, label: t('help.shortcuts.newNode'), description: t('help.shortcuts.newNodeDescription') },
+    { icon: Move, label: t('help.shortcuts.panCanvas'), description: t('help.shortcuts.panCanvasDescription') },
+    { icon: MousePointer2, label: t('help.shortcuts.selectText'), description: t('help.shortcuts.selectTextDescription') },
+    { icon: GitBranch, label: t('help.shortcuts.branchFromText'), description: t('help.shortcuts.branchFromTextDescription') },
+    { icon: BoxSelect, label: t('help.shortcuts.multiSelectNodes'), description: t('help.shortcuts.multiSelectNodesDescription') },
+    { icon: GitBranch, label: t('help.shortcuts.mergeNodes'), description: t('help.shortcuts.mergeNodesDescription') },
+    { icon: Maximize2, label: t('help.shortcuts.maximizeNode'), description: t('help.shortcuts.maximizeNodeDescription') },
+  ];
+
+  const tips = [
+    t('help.tips.escClosesPopup'),
+    t('help.tips.mergedNodesContext'),
+    t('help.tips.branchRetainsContext'),
+  ];
+
   return (
     <div className="absolute top-4 left-16 z-40 w-80 rounded-xl border border-neutral-700/50 bg-surface-900 shadow-2xl shadow-black/50 overflow-hidden">
       <div className="px-4 py-3 border-b border-neutral-700/50">
-        <h3 className="text-sm font-semibold text-neutral-200">Quick Guide</h3>
+        <h3 className="text-sm font-semibold text-neutral-200">{t('help.title')}</h3>
       </div>
 
       <div className="p-3 space-y-2">
@@ -38,7 +41,7 @@ export function HelpGuidePanel() {
       </div>
 
       <div className="px-4 py-2.5 border-t border-neutral-700/50 bg-neutral-800/30">
-        <div className="text-[10px] font-semibold text-neutral-400 uppercase tracking-wider mb-1.5">Tips</div>
+        <div className="text-[10px] font-semibold text-neutral-400 uppercase tracking-wider mb-1.5">{t('help.tips.title')}</div>
         <ul className="space-y-1">
           {tips.map((tip, i) => (
             <li key={i} className="text-[11px] text-neutral-500 leading-snug flex gap-1.5">

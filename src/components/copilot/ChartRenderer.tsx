@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import {
   PieChart, Pie, Cell, Tooltip, Legend,
   BarChart, Bar, XAxis, YAxis, CartesianGrid,
@@ -24,12 +25,13 @@ interface ChartRendererProps {
 }
 
 export function ChartRenderer({ args }: ChartRendererProps) {
+  const { t } = useTranslation();
   const { chartType = 'pie', title, data = [] } = args;
 
   if (data.length === 0) {
     return (
       <div className="my-2 rounded-lg border border-neutral-700 bg-neutral-900 p-3 text-xs text-neutral-400">
-        No chart data provided.
+        {t('chart.noData')}
       </div>
     );
   }
