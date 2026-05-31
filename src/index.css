@@ -312,6 +312,19 @@ html, body, #root {
   border-top: 1px solid #262626 !important;
 }
 
+/* Direct selector for the bottom container */
+#root > div:nth-child(3) > aside > div > div > div > div.cpk\:absolute.cpk\:bottom-0.cpk\:left-0.cpk\:right-0.cpk\:z-20.cpk\:pointer-events-none {
+  background-color: #171717 !important;
+}
+
+#root > div:nth-child(3) > aside > div > div > div > div.cpk\:absolute.cpk\:bottom-0.cpk\:left-0.cpk\:right-0.cpk\:z-20.cpk\:pointer-events-none > div {
+  background-color: #171717 !important;
+}
+
+#root > div:nth-child(3) > aside > div > div > div > div.cpk\:absolute.cpk\:bottom-0.cpk\:left-0.cpk\:right-0.cpk\:z-20.cpk\:pointer-events-none > div > div {
+  background-color: #171717 !important;
+}
+
 /* Input container inner */
 .cpk\:pointer-events-none.cpk\:relative.cpk\:z-20 {
   background-color: #171717 !important;
@@ -374,5 +387,39 @@ html, body, #root {
 
 /* Override inline styles */
 [data-copilot-sidebar] div[style*="background"] {
+  background-color: #171717 !important;
+}
+
+/* Universal bottom container override */
+[data-copilot-sidebar] div[class*="cpk:absolute"][class*="cpk:bottom-0"] {
+  background-color: #171717 !important;
+}
+
+[data-copilot-sidebar] div[class*="cpk:absolute"][class*="cpk:bottom-0"] > div {
+  background-color: #171717 !important;
+}
+
+[data-copilot-sidebar] div[class*="cpk:absolute"][class*="cpk:bottom-0"] > div > div {
+  background-color: #171717 !important;
+}
+
+/* Input container with pointer-events-none */
+[data-copilot-sidebar] div[class*="pointer-events-none"][class*="absolute"][class*="bottom-0"] {
+  background-color: #171717 !important;
+}
+
+/* Force all children in bottom area */
+[data-copilot-sidebar] aside > div > div > div > div {
+  background-color: #171717 !important;
+}
+
+/* Last child in sidebar (usually input area) */
+[data-copilot-sidebar] > aside > div > div:last-child,
+[data-copilot-sidebar] aside > div > div:last-child {
+  background-color: #171717 !important;
+}
+
+/* Override by path depth */
+[data-copilot-sidebar] > div > div > div > div:last-child {
   background-color: #171717 !important;
 }
