@@ -63,7 +63,8 @@
     "newWorkspace": "New Workspace",
     "renameWorkspace": "Rename workspace",
     "deleteWorkspace": "Delete workspace",
-    "exportWorkspace": "Export Workspace",
+    "exportWorkspace": "Export Workspace (JSON)",
+    "exportMarkdown": "Export as Markdown",
     "importWorkspace": "Import Workspace",
     "github": "View on GitHub"
   },

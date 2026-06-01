@@ -63,7 +63,8 @@
     "newWorkspace": "新建工作区",
     "renameWorkspace": "重命名工作区",
     "deleteWorkspace": "删除工作区",
-    "exportWorkspace": "导出工作区",
+    "exportWorkspace": "导出工作区 (JSON)",
+    "exportMarkdown": "导出为 Markdown",
     "importWorkspace": "导入工作区",
     "github": "在 GitHub 上查看"
   },

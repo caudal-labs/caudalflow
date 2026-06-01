@@ -1,8 +1,11 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ChevronDown, Plus, Trash2, Download, Upload, Check, Pencil, Github } from 'lucide-react';
+import { ChevronDown, Plus, Trash2, Download, Upload, Check, Pencil, Github, FileText } from 'lucide-react';
 import { useWorkspaceStore } from '../../stores/workspaceStore';
+import { useFlowStore } from '../../stores/flowStore';
+import { useChatStore } from '../../stores/chatStore';
 import { exportWorkspace, importWorkspace } from '../../hooks/usePersistence';
+import { exportMarkdown } from '../../utils/markdownExport';
 
 export function WorkspaceSelector() {
   const { t } = useTranslation();
@@ -111,6 +114,24 @@ export function WorkspaceSelector() {
 
   const handleImport = useCallback(() => fileRef.current?.click(), []);
 
+  const handleExportMarkdown = useCallback(() => {
+    const flow = useFlowStore.getState();
+    const chat = useChatStore.getState();
+    const workspace = useWorkspaceStore.getState().getActiveWorkspace();
+    
+    // Get selected nodes
+    const selectedNodes = flow.nodes.filter(n => n.selected);
+    const selectedIds = selectedNodes.length > 0 ? selectedNodes.map(n => n.id) : undefined;
+    
+    exportMarkdown(
+      flow.nodes,
+      flow.edges,
+      chat.conversations,
+      workspace?.name ?? 'CaudalFlow Workspace',
+      { selectedNodeIds: selectedIds }
+    );
+  }, []);
+
   const handleFileChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const file = e.target.files?.[0];
@@ -200,6 +221,13 @@ export function WorkspaceSelector() {
 
       {/* Right: export + import + github */}
       <div className="flex items-center gap-1">
+        <button
+          onClick={handleExportMarkdown}
+          className="p-1.5 text-text-muted hover:text-text-primary transition-colors"
+          title={t('workspace.exportMarkdown')}
+        >
+          <FileText size={15} />
+        </button>
         <button
           onClick={exportWorkspace}
           className="p-1.5 text-text-muted hover:text-text-primary transition-colors"
