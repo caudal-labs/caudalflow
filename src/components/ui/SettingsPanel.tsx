@@ -1,8 +1,9 @@
 import { useTranslation } from 'react-i18next';
-import { X, Sun, Moon, Monitor, Eye, EyeOff } from 'lucide-react';
-import { useState } from 'react';
+import { X, Sun, Moon, Monitor, Eye, EyeOff, RefreshCw, CheckCircle, XCircle, Loader2 } from 'lucide-react';
+import { useState, useCallback } from 'react';
 import { useSettingsStore } from '../../stores/settingsStore';
 import { listProviders } from '../../services/providers/registry';
+import { fetchModels, testConnection } from '../../services/providers/api';
 
 export function SettingsPanel() {
   const { t } = useTranslation();
@@ -18,6 +19,10 @@ export function SettingsPanel() {
   const setTheme = useSettingsStore((s) => s.setTheme);
   const providers = listProviders();
   const [showApiKey, setShowApiKey] = useState(false);
+  const [loadingModels, setLoadingModels] = useState(false);
+  const [testingConnection, setTestingConnection] = useState(false);
+  const [connectionResult, setConnectionResult] = useState<{ success: boolean; message: string } | null>(null);
+  const [models, setModels] = useState<{ id: string; name: string }[]>([]);
 
   if (!showSettings) return null;
 
@@ -30,6 +35,29 @@ export function SettingsPanel() {
     { value: 'dark' as const, icon: Moon, label: t('settings.themeDark') },
     { value: 'system' as const, icon: Monitor, label: t('settings.themeSystem') },
   ];
+
+  const handleFetchModels = useCallback(async () => {
+    if (!config.endpoint || !config.apiKey) return;
+    setLoadingModels(true);
+    try {
+      const fetchedModels = await fetchModels(config.endpoint, config.apiKey);
+      setModels(fetchedModels);
+    } finally {
+      setLoadingModels(false);
+    }
+  }, [config.endpoint, config.apiKey]);
+
+  const handleTestConnection = useCallback(async () => {
+    if (!config.endpoint || !config.apiKey) return;
+    setTestingConnection(true);
+    setConnectionResult(null);
+    try {
+      const result = await testConnection(config.endpoint, config.apiKey);
+      setConnectionResult(result);
+    } finally {
+      setTestingConnection(false);
+    }
+  }, [config.endpoint, config.apiKey]);
 
   return (
     <div className="absolute top-0 right-0 z-50 h-full w-80 bg-surface-900 border-l border-border shadow-2xl shadow-black/50 flex flex-col">
@@ -81,6 +109,20 @@ export function SettingsPanel() {
           </select>
         </div>
 
+        {/* Provider Name - Editable for custom */}
+        {config.providerId === 'custom' && (
+          <div>
+            <label className={labelClass}>{t('settings.providerName')}</label>
+            <input
+              type="text"
+              value={config.providerName}
+              onChange={(e) => updateConfig({ providerName: e.target.value })}
+              className={inputClass}
+              placeholder="My Custom Provider"
+            />
+          </div>
+        )}
+
         {/* API Key Input - Show for all providers except mock */}
         {config.providerId !== 'mock' && (
           <div>
@@ -121,6 +163,38 @@ export function SettingsPanel() {
             <p className="text-[10px] text-text-muted mt-1">
               {t('settings.endpointDescription')}
             </p>
+
+            {/* Test Connection & Fetch Models */}
+            <div className="flex gap-2 mt-2">
+              <button
+                onClick={handleTestConnection}
+                disabled={!config.endpoint || !config.apiKey || testingConnection}
+                className="flex items-center gap-1.5 px-3 py-1.5 text-xs bg-surface-700 hover:bg-surface-600 rounded-md transition-colors disabled:opacity-50"
+              >
+                {testingConnection ? (
+                  <Loader2 size={12} className="animate-spin" />
+                ) : connectionResult?.success ? (
+                  <CheckCircle size={12} className="text-green-400" />
+                ) : connectionResult?.success === false ? (
+                  <XCircle size={12} className="text-red-400" />
+                ) : null}
+                {t('settings.testConnection')}
+              </button>
+              <button
+                onClick={handleFetchModels}
+                disabled={!config.endpoint || !config.apiKey || loadingModels}
+                className="flex items-center gap-1.5 px-3 py-1.5 text-xs bg-surface-700 hover:bg-surface-600 rounded-md transition-colors disabled:opacity-50"
+              >
+                {loadingModels ? <Loader2 size={12} className="animate-spin" /> : <RefreshCw size={12} />}
+                {t('settings.fetchModels')}
+              </button>
+            </div>
+
+            {connectionResult && (
+              <p className={`text-[10px] mt-1 ${connectionResult.success ? 'text-green-400' : 'text-red-400'}`}>
+                {connectionResult.message}
+              </p>
+            )}
           </div>
         )}
 
@@ -129,13 +203,28 @@ export function SettingsPanel() {
           <>
             <div>
               <label className={labelClass}>{t('settings.model')}</label>
-              <input
-                type="text"
-                value={config.model}
-                onChange={(e) => updateConfig({ model: e.target.value })}
-                className={inputClass}
-                placeholder={config.providerId === 'openai' ? 'gpt-4o-mini' : config.providerId === 'anthropic' ? 'claude-sonnet-4-20250514' : 'model-id'}
-              />
+              {models.length > 0 ? (
+                <select
+                  value={config.model}
+                  onChange={(e) => updateConfig({ model: e.target.value })}
+                  className={inputClass}
+                >
+                  <option value="">{t('settings.selectModel')}</option>
+                  {models.map((m) => (
+                    <option key={m.id} value={m.id}>
+                      {m.name}
+                    </option>
+                  ))}
+                </select>
+              ) : (
+                <input
+                  type="text"
+                  value={config.model}
+                  onChange={(e) => updateConfig({ model: e.target.value })}
+                  className={inputClass}
+                  placeholder={config.providerId === 'openai' ? 'gpt-4o-mini' : config.providerId === 'anthropic' ? 'claude-sonnet-4-20250514' : 'model-id'}
+                />
+              )}
             </div>
             <div>
               <label className={labelClass}>{t('settings.temperature')}</label>

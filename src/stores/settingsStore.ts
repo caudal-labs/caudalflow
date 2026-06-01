@@ -43,7 +43,8 @@ export const useSettingsStore = create<SettingsState>()(
     (set, get) => ({
       llmConfig: {
         providerId: 'mock',
-        endpoint: 'https://api.openai.com/v1',
+        providerName: 'Mock',
+        endpoint: 'https://api.openai.com/v1/chat/completions',
         apiKey: '',
         model: 'gpt-4o-mini',
         temperature: 0.7,

@@ -20,6 +20,7 @@ export interface Conversation {
 
 export interface LLMConfig {
   providerId: string;
+  providerName: string;
   endpoint: string;
   apiKey: string;
   model: string;
