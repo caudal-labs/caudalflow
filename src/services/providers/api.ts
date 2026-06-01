@@ -5,8 +5,17 @@ export interface ModelInfo {
 
 export async function fetchModels(endpoint: string, apiKey: string): Promise<ModelInfo[]> {
   try {
-    // Try OpenAI-compatible /v1/models endpoint
-    const modelsUrl = endpoint.replace(/\/chat\/completions$/, '/models');
+    // Build models endpoint from chat completions endpoint
+    let modelsUrl: string;
+    if (endpoint.includes('/chat/completions')) {
+      modelsUrl = endpoint.replace(/\/chat\/completions$/, '/models');
+    } else if (endpoint.endsWith('/v1') || endpoint.endsWith('/v1/')) {
+      modelsUrl = endpoint.replace(/\/?$/, '/models');
+    } else {
+      // Assume user provided base URL, try /v1/models
+      modelsUrl = endpoint.replace(/\/?$/, '') + '/v1/models';
+    }
+    
     const response = await fetch(modelsUrl, {
       headers: {
         'Authorization': `Bearer ${apiKey}`,
@@ -42,7 +51,17 @@ export async function fetchModels(endpoint: string, apiKey: string): Promise<Mod
 
 export async function testConnection(endpoint: string, apiKey: string): Promise<{ success: boolean; message: string }> {
   try {
-    const response = await fetch(endpoint, {
+    // Build chat completions endpoint
+    let chatUrl: string;
+    if (endpoint.includes('/chat/completions')) {
+      chatUrl = endpoint;
+    } else if (endpoint.endsWith('/v1') || endpoint.endsWith('/v1/')) {
+      chatUrl = endpoint.replace(/\/?$/, '') + '/chat/completions';
+    } else {
+      chatUrl = endpoint.replace(/\/?$/, '') + '/v1/chat/completions';
+    }
+
+    const response = await fetch(chatUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

@@ -11,7 +11,7 @@
     "apiKeyPlaceholder": "Enter your API key",
     "apiKeyDescription": "Your API key is stored locally and sent directly to the provider.",
     "endpoint": "API Endpoint URL",
-    "endpointDescription": "The API endpoint URL for OpenAI-compatible services.",
+    "endpointDescription": "Base URL (e.g. https://api.deepseek.com) or full path (e.g. https://api.deepseek.com/v1/chat/completions)",
     "testConnection": "Test",
     "fetchModels": "Fetch Models",
     "selectModel": "Select a model",

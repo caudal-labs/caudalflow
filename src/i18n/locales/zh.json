@@ -11,7 +11,7 @@
     "apiKeyPlaceholder": "输入你的 API 密钥",
     "apiKeyDescription": "你的 API 密钥存储在本地，直接发送给提供商。",
     "endpoint": "API 端点 URL",
-    "endpointDescription": "OpenAI 兼容服务的 API 端点 URL。",
+    "endpointDescription": "基础 URL（如 https://api.deepseek.com）或完整路径（如 https://api.deepseek.com/v1/chat/completions）",
     "testConnection": "测试连接",
     "fetchModels": "获取模型列表",
     "selectModel": "选择模型",
