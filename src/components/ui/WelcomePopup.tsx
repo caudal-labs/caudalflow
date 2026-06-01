@@ -1,8 +1,10 @@
 import { useEffect, useCallback } from 'react';
+import { useTranslation, Trans } from 'react-i18next';
 import { Settings, Sparkles } from 'lucide-react';
 import { useSettingsStore } from '../../stores/settingsStore';
 
 export function WelcomePopup() {
+  const { t } = useTranslation();
   const providerId = useSettingsStore((s) => s.llmConfig.providerId);
   const welcomeDismissed = useSettingsStore((s) => s.welcomeDismissed);
   const dismissWelcome = useSettingsStore((s) => s.dismissWelcome);
@@ -41,17 +43,19 @@ export function WelcomePopup() {
       >
         <div className="flex items-center gap-2 mb-3">
           <Sparkles size={18} className="text-accent-400" />
-          <h2 className="text-base font-semibold text-neutral-100">
-            Welcome to CaudalFlow
+          <h2 className="text-base font-semibold text-text-primary">
+            {t('welcome.title')}
           </h2>
         </div>
 
-        <p className="text-sm text-neutral-300 mb-2">
-          You're currently in <span className="text-accent-300 font-medium">mock mode</span> — responses are simulated so you can explore the canvas without an API key.
+        <p className="text-sm text-text-secondary mb-2">
+          <Trans i18nKey="welcome.mockModeDescription">
+            You're currently in <span className="text-accent-300 font-medium">mock mode</span> — responses are simulated so you can explore the canvas without an API key.
+          </Trans>
         </p>
 
-        <p className="text-sm text-neutral-400 mb-4">
-          To use real AI, open Settings and connect an Anthropic or OpenAI provider.
+        <p className="text-sm text-text-secondary mb-4">
+          {t('welcome.realAiDescription')}
         </p>
 
         <div className="flex gap-2">
@@ -60,13 +64,13 @@ export function WelcomePopup() {
             onClick={handleOpenSettings}
           >
             <Settings size={14} />
-            Open Settings
+            {t('welcome.openSettings')}
           </button>
           <button
-            className="flex-1 text-sm font-medium rounded-md px-3 py-2 text-neutral-300 hover:text-neutral-100 bg-surface-700/50 hover:bg-surface-700 border border-surface-600 transition-colors"
+            className="flex-1 text-sm font-medium rounded-md px-3 py-2 text-text-secondary hover:text-text-primary bg-surface-700/50 hover:bg-surface-700 border border-surface-600 transition-colors"
             onClick={handleDismiss}
           >
-            Explore Mock Mode
+            {t('welcome.exploreMockMode')}
           </button>
         </div>
       </div>

@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Sparkles, ArrowRight, X } from 'lucide-react';
 
 interface SelectionPopupProps {
@@ -10,12 +11,13 @@ interface SelectionPopupProps {
 }
 
 export function SelectionPopup({ text, x, y, onExplore, onDismiss }: SelectionPopupProps) {
+  const { t } = useTranslation();
   const [input, setInput] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    const t = setTimeout(() => inputRef.current?.focus(), 50);
-    return () => clearTimeout(t);
+    const timer = setTimeout(() => inputRef.current?.focus(), 50);
+    return () => clearTimeout(timer);
   }, []);
 
   useEffect(() => {
@@ -54,16 +56,16 @@ export function SelectionPopup({ text, x, y, onExplore, onDismiss }: SelectionPo
     >
       <div className="px-2.5 pt-2 pb-1.5">
         <div className="flex items-center justify-between mb-1.5">
-          <div className="text-[10px] text-neutral-500 truncate">
-            Selection: <span className="text-neutral-400">&ldquo;{truncated}&rdquo;</span>
+          <div className="text-[10px] text-text-muted truncate">
+            {t('selection.selectionLabel')} <span className="text-text-secondary">&ldquo;{truncated}&rdquo;</span>
           </div>
           <button
             onClick={(e) => {
               e.stopPropagation();
               onDismiss();
             }}
-            className="shrink-0 text-neutral-500 hover:text-neutral-200 transition-colors ml-1"
-            title="Close (Esc)"
+            className="shrink-0 text-text-muted hover:text-text-primary transition-colors ml-1"
+            title={t('selection.closeEsc')}
           >
             <X size={12} />
           </button>
@@ -75,12 +77,12 @@ export function SelectionPopup({ text, x, y, onExplore, onDismiss }: SelectionPo
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder={`Ask about "${truncated}"`}
-            className="flex-1 min-w-0 bg-neutral-800/80 text-sm text-neutral-200 rounded-md px-2.5 py-1.5 placeholder-neutral-500 border border-neutral-700/50 focus:border-accent-500/50 focus:outline-none transition-colors"
+            placeholder={t('selection.askAbout', { text: truncated })}
+            className="flex-1 min-w-0 bg-surface-800 text-sm text-text-primary rounded-md px-2.5 py-1.5 placeholder-text-muted border border-border focus:border-accent-500/50 focus:outline-none transition-colors"
           />
           <button
             className="shrink-0 p-1.5 rounded-md bg-accent-500/20 text-accent-400 hover:bg-accent-500/30 transition-colors"
-            title="Send"
+            title={t('selection.send')}
             onClick={(e) => {
               e.stopPropagation();
               submit(input.trim());
@@ -90,16 +92,16 @@ export function SelectionPopup({ text, x, y, onExplore, onDismiss }: SelectionPo
           </button>
         </div>
       </div>
-      <div className="border-t border-neutral-700/30 px-1.5 py-1">
+      <div className="border-t border-border px-1.5 py-1">
         <button
-          className="w-full flex items-center gap-1.5 text-xs text-neutral-400 hover:text-accent-400 hover:bg-accent-500/10 rounded-md px-2 py-1 transition-colors"
+          className="w-full flex items-center gap-1.5 text-xs text-text-secondary hover:text-accent-400 hover:bg-accent-500/10 rounded-md px-2 py-1 transition-colors"
           onClick={(e) => {
             e.stopPropagation();
             submit('');
           }}
         >
           <Sparkles size={12} />
-          <span>Explore</span>
+          <span>{t('selection.explore')}</span>
         </button>
       </div>
     </div>

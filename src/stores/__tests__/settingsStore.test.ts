@@ -3,6 +3,7 @@ import { useSettingsStore } from '../settingsStore';
 
 const INITIAL_CONFIG = {
   providerId: 'mock',
+    providerName: 'Mock',
   endpoint: 'https://api.openai.com/v1',
   apiKey: '',
   model: 'gpt-4o-mini',

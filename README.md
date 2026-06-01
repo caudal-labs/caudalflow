@@ -3,10 +3,13 @@
   <img src="https://img.shields.io/badge/TypeScript-5.9-3178C6?style=flat-square&logo=typescript&logoColor=white" />
   <img src="https://img.shields.io/badge/Vite-8-646CFF?style=flat-square&logo=vite&logoColor=white" />
   <img src="https://img.shields.io/badge/Tailwind-4-06B6D4?style=flat-square&logo=tailwindcss&logoColor=white" />
-  <img src="https://img.shields.io/badge/Python-3.11+-3776AB?style=flat-square&logo=python&logoColor=white" />
-  <img src="https://img.shields.io/badge/LangGraph-0.2+-1C3C3C?style=flat-square&logo=langchain&logoColor=white" />
-  <img src="https://img.shields.io/badge/CopilotKit-1.57+-000000?style=flat-square" />
+  <img src="https://img.shields.io/badge/Node.js-20+-339933?style=flat-square&logo=node.js&logoColor=white" />
+  <img src="https://img.shields.io/badge/Vercel%20AI%20SDK-4-000000?style=flat-square" />
   <img src="https://img.shields.io/badge/License-MIT-green?style=flat-square" />
+</p>
+
+<p align="center">
+  <b>English</b> | <a href="./README_CN.md">中文</a>
 </p>
 
 <h1 align="center">CaudalFlow</h1>
@@ -85,50 +88,73 @@ Adding a new provider is four files and zero changes to the rest of the app — 
 
 Organize your explorations into separate workspaces. Each workspace persists its full state — nodes, edges, conversations, positions — to localStorage. Export and import workspaces as JSON files.
 
-### Keyboard-Driven Workflow
+### Theme System
+
+Switch between light, dark, and system themes. The theme is applied consistently across all components using CSS variables. Theme preference is saved to localStorage.
+
+- **Dark theme** — deep dark background with high contrast
+- **Light theme** — clean white background for bright environments
+- **System** — automatically follows your OS theme setting
+
+### Internationalization (i18n)
+
+Full support for English and Chinese languages. All UI text, tooltips, and messages are internationalized. Language preference is saved to localStorage.
+
+### Node Interactions
 
 | Action | How |
 |--------|-----|
 | New node | Double-click canvas or `+` button |
-| Pan canvas | Click & drag |
-| Branch from text | Select text, click **Branch** button |
+| Pan canvas | Hold **Space** + drag |
+| Select node | Click on node |
 | Multi-select nodes | **Shift** + drag |
-| Merge selected nodes | Type action in merge popup |
-| Dismiss popups | **Esc** |
+| Branch from text | Select text, click **Branch** button |
+| Delete node | Press **Delete**/**X** key or click **X** button (with confirmation) |
+| Collapse node | Click collapse button in header |
 | Maximize node | Click maximize in header |
+| Connect nodes | Drag from node handle to another node |
+| Create connected node | Drag from node handle to empty area |
+
+### Tooltips
+
+All toolbar buttons have descriptive tooltips that appear on hover, helping you understand each function.
 
 ---
 
 ## Quick Start
 
-**Prerequisites:** Node.js 20+, Python 3.11+, an API key from [Anthropic](https://console.anthropic.com/), [OpenAI](https://platform.openai.com/), or [Google AI](https://ai.google.dev/)
+### Option 1: Vercel (Recommended)
+
+1. Fork the repository
+2. Import to Vercel
+3. Deploy
+
+### Option 2: Local Development
 
 ```bash
-git clone https://github.com/caudal-labs/caudalflow.git
+git clone https://github.com/yancongya/caudalflow.git
 cd caudalflow
 npm install
-npm run install:agent   # creates Python venv, installs agent deps
 ```
 
-Create `apps/agent/.env` with at least one LLM key:
-
-```env
-ANTHROPIC_API_KEY=sk-ant-...
-# and/or
-OPENAI_API_KEY=sk-...
-# and/or
-GOOGLE_API_KEY=...
-```
-
-Launch the full stack:
+Start development server:
 
 ```bash
-npm run dev:copilot
+npm run dev
 ```
 
-This starts the Vite dev server, the Hono BFF, and the LangGraph agent concurrently. Open **http://localhost:5173** — the canvas and copilot sidebar are ready.
+Open **http://localhost:5173** — the app is ready.
 
-> **Your keys stay on your machine.** API keys live in your local `.env` file and go through your local BFF to the provider — never a third-party server.
+### Option 3: Full Stack (with BFF)
+
+```bash
+npm run dev:ui          # Frontend only
+npm run dev:bff         # BFF server (port 4000)
+```
+
+Configure API key in Settings panel — no environment variables needed!
+
+> **Your keys stay on your machine.** API keys are stored in browser localStorage and sent directly to the provider.
 
 ---
 
@@ -178,7 +204,7 @@ Four Zustand stores keep things clean:
 |-------|---------------|
 | `flowStore` | Nodes, edges, graph mutations |
 | `chatStore` | Messages per node, streaming state |
-| `settingsStore` | LLM config, UI preferences |
+| `settingsStore` | LLM config, UI preferences, theme, language |
 | `workspaceStore` | Multi-workspace management |
 
 Everything persists to localStorage with debounced auto-save.
@@ -258,10 +284,11 @@ Providers are registered at startup and selected at runtime. The rest of the app
 | Styling | Tailwind CSS 4 |
 | Canvas | @xyflow/react 12 |
 | State | Zustand 5 |
-| Copilot | CopilotKit 1.57 |
+| AI | Vercel AI SDK |
+| LLM Providers | Anthropic, OpenAI, Custom (OpenAI Compatible) |
+| i18n | react-i18next |
 | Charts | Recharts 3 |
 | BFF | Hono 4 |
-| Agent | Python 3.11+, LangGraph, LangChain |
 | Markdown | react-markdown + remark-gfm |
 | Code Highlighting | react-syntax-highlighter (Prism) |
 | Icons | Lucide React |
@@ -302,6 +329,7 @@ src/
 │   ├── edges/         # TopicEdge (custom edge renderer)
 │   └── ui/            # SettingsPanel, HelpGuide, WorkspaceSelector
 ├── hooks/             # useChatNode (core chat logic), usePersistence
+├── i18n/              # Internationalization (en.json, zh.json)
 ├── stores/            # flowStore, chatStore, settingsStore, workspaceStore
 ├── services/
 │   ├── llm.ts         # Streaming orchestrator
@@ -326,6 +354,50 @@ See the [step-by-step guide in CONTRIBUTING.md](CONTRIBUTING.md#adding-a-new-llm
 
 ---
 
+## Changelog
+
+### v2.1.0 (Latest)
+
+- **Theme System** — Light, dark, and system theme support with CSS variables
+- **Internationalization** — Full English and Chinese language support
+- **Custom Chat Panel** — Replaced CopilotKit sidebar with custom dark-themed chat component
+- **Improved Interactions** — Space key to pan, Delete/X key to delete (with confirmation)
+- **Node Collapse** — Collapsed nodes show as small cards, expand on click
+- **Connect to Create** — Drag from node handle to empty area to create connected node
+- **Tooltips** — All toolbar buttons have descriptive hover tooltips
+
+### v2.0.0
+
+- Major rewrite with CopilotKit integration
+- LangGraph agent support
+- Generative UI (branch proposals, merge plans, charts)
+- Multi-workspace support
+
+---
+
+## Deployment
+
+### Vercel (Recommended)
+
+1. Fork the repository
+2. Go to [vercel.com/new](https://vercel.com/new)
+3. Import your fork
+4. Deploy
+
+No environment variables needed — API keys are configured in the app settings.
+
+### Other Platforms
+
+The app can be deployed to any Node.js platform:
+
+- Railway
+- Fly.io
+- Render
+- AWS Lambda
+- Cloudflare Workers
+
+---
+
 ## Contributing
 
 We welcome contributions! See [CONTRIBUTING.md](CONTRIBUTING.md) for:
@@ -343,5 +415,5 @@ We welcome contributions! See [CONTRIBUTING.md](CONTRIBUTING.md) for:
 ---
 
 <p align="center">
-  Built by <a href="https://github.com/caudal-labs">Caudal Labs</a>
+  Built by <a href="https://github.com/caudal-labs">Caudal Labs</a> | Forked by <a href="https://github.com/yancongya">yancongya</a>
 </p>

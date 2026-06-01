@@ -41,3 +41,4 @@ coverage
 __pycache__/
 *.pyc
 .langgraph_api/
+.vercel
