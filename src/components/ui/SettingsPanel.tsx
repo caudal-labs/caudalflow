@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next';
-import { X, Sun, Moon, Monitor } from 'lucide-react';
+import { X, Sun, Moon, Monitor, Eye, EyeOff } from 'lucide-react';
+import { useState } from 'react';
 import { useSettingsStore } from '../../stores/settingsStore';
 import { listProviders } from '../../services/providers/registry';
 
@@ -16,6 +17,7 @@ export function SettingsPanel() {
   const theme = useSettingsStore((s) => s.theme);
   const setTheme = useSettingsStore((s) => s.setTheme);
   const providers = listProviders();
+  const [showApiKey, setShowApiKey] = useState(false);
 
   if (!showSettings) return null;
 
@@ -63,6 +65,7 @@ export function SettingsPanel() {
           </div>
         </div>
 
+        {/* LLM Provider Section */}
         <div>
           <label className={labelClass}>{t('settings.llmProvider')}</label>
           <select
@@ -78,13 +81,35 @@ export function SettingsPanel() {
           </select>
         </div>
 
-        {config.providerId === 'openai' && (
-          <>
-            <div>
-              <p className="text-xs text-text-muted">
-                {t('settings.apiKeyConfigured')}
-              </p>
+        {/* API Key Input - Show for all providers except mock */}
+        {config.providerId !== 'mock' && (
+          <div>
+            <label className={labelClass}>{t('settings.apiKey')}</label>
+            <div className="relative">
+              <input
+                type={showApiKey ? 'text' : 'password'}
+                value={config.apiKey}
+                onChange={(e) => updateConfig({ apiKey: e.target.value })}
+                className={inputClass}
+                placeholder={t('settings.apiKeyPlaceholder')}
+              />
+              <button
+                type="button"
+                onClick={() => setShowApiKey(!showApiKey)}
+                className="absolute right-2 top-1/2 -translate-y-1/2 text-text-muted hover:text-text-primary"
+              >
+                {showApiKey ? <EyeOff size={14} /> : <Eye size={14} />}
+              </button>
             </div>
+            <p className="text-[10px] text-text-muted mt-1">
+              {t('settings.apiKeyDescription')}
+            </p>
+          </div>
+        )}
+
+        {/* Model Config - Show for non-mock providers */}
+        {config.providerId !== 'mock' && (
+          <>
             <div>
               <label className={labelClass}>{t('settings.model')}</label>
               <input
@@ -92,7 +117,7 @@ export function SettingsPanel() {
                 value={config.model}
                 onChange={(e) => updateConfig({ model: e.target.value })}
                 className={inputClass}
-                placeholder="gpt-4o-mini"
+                placeholder={config.providerId === 'openai' ? 'gpt-4o-mini' : 'claude-sonnet-4-20250514'}
               />
             </div>
             <div>
@@ -126,54 +151,7 @@ export function SettingsPanel() {
           </>
         )}
 
-        {config.providerId === 'anthropic' && (
-          <>
-            <div>
-              <p className="text-xs text-text-muted">
-                {t('settings.apiKeyConfigured')}
-              </p>
-            </div>
-            <div>
-              <label className={labelClass}>{t('settings.model')}</label>
-              <input
-                type="text"
-                value={config.model}
-                onChange={(e) => updateConfig({ model: e.target.value })}
-                className={inputClass}
-                placeholder="claude-sonnet-4-5-20250929"
-              />
-            </div>
-            <div>
-              <label className={labelClass}>{t('settings.temperature')}</label>
-              <input
-                type="range"
-                min="0"
-                max="1"
-                step="0.1"
-                value={config.temperature}
-                onChange={(e) =>
-                  updateConfig({ temperature: parseFloat(e.target.value) })
-                }
-                className="w-full accent-accent-500"
-              />
-              <div className="text-xs text-text-muted text-right">
-                {config.temperature}
-              </div>
-            </div>
-            <div>
-              <label className={labelClass}>{t('settings.maxTokens')}</label>
-              <input
-                type="number"
-                value={config.maxTokens}
-                onChange={(e) =>
-                  updateConfig({ maxTokens: parseInt(e.target.value) || 4096 })
-                }
-                className={inputClass}
-              />
-            </div>
-          </>
-        )}
-
+        {/* Mock Provider Config */}
         {config.providerId === 'mock' && (
           <div>
             <label className={labelClass}>{t('settings.tokenDelay')}</label>
@@ -193,6 +171,7 @@ export function SettingsPanel() {
           </div>
         )}
 
+        {/* Display Settings */}
         <div className="border-t border-border pt-4">
           <h3 className="text-xs font-semibold text-text-secondary mb-3">{t('settings.display')}</h3>
           <label className="flex items-center justify-between cursor-pointer">
@@ -215,6 +194,7 @@ export function SettingsPanel() {
           </p>
         </div>
 
+        {/* Language Settings */}
         <div className="border-t border-border pt-4">
           <h3 className="text-xs font-semibold text-text-secondary mb-3">Language</h3>
           <select

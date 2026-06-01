@@ -13,7 +13,7 @@ app.use(
   '*',
   cors({
     origin: process.env.FRONTEND_ORIGIN ?? 'http://localhost:5173',
-    allowHeaders: ['Content-Type', 'Authorization', 'x-llm-provider'],
+    allowHeaders: ['Content-Type', 'Authorization', 'x-llm-provider', 'x-api-key'],
     allowMethods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'],
   }),
 );
@@ -41,9 +41,11 @@ app.post('/api/llm', async (c) => {
     return c.json({ error: `Unknown provider: ${provider ?? 'none'}` }, 400);
   }
 
-  const apiKey = process.env[cfg.envKey];
+  // Use API key from request header first, fallback to env var
+  const requestApiKey = c.req.header('x-api-key');
+  const apiKey = requestApiKey || process.env[cfg.envKey];
   if (!apiKey) {
-    return c.json({ error: `Missing env var ${cfg.envKey}` }, 502);
+    return c.json({ error: `Missing API key. Configure it in Settings or set ${cfg.envKey} environment variable.` }, 502);
   }
 
   const upstream = await fetch(cfg.url, {

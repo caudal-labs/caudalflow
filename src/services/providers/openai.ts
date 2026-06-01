@@ -61,6 +61,7 @@ export const OpenAIProvider: LLMProvider = {
         headers: {
           'Content-Type': 'application/json',
           'x-llm-provider': 'openai',
+          'x-api-key': config.apiKey || '',
         },
         body: JSON.stringify(body),
         signal,
