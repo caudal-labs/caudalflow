@@ -1,11 +1,10 @@
 import { Hono } from 'hono';
 import { serve } from '@hono/node-server';
 import { cors } from 'hono/cors';
-import { streamText, tool } from 'ai';
+import { streamText } from 'ai';
 import { createAnthropic } from '@ai-sdk/anthropic';
 import { createOpenAI } from '@ai-sdk/openai';
 import { createGoogleGenerativeAI } from '@ai-sdk/google';
-import { z } from 'zod';
 
 const app = new Hono();
 
@@ -67,79 +66,6 @@ app.post('/api/llm', async (c) => {
   });
 });
 
-// Canvas tools that the agent can call
-const canvasTools = {
-  createChatNode: tool({
-    description: 'Create a new chat node on the canvas',
-    parameters: z.object({
-      topic: z.string().default('New Chat'),
-      x: z.number().optional(),
-      y: z.number().optional(),
-    }),
-  }),
-  createBranchFromNode: tool({
-    description: 'Create a branch from an existing node',
-    parameters: z.object({
-      parentNodeId: z.string(),
-      topic: z.string(),
-      prompt: z.string().optional(),
-    }),
-  }),
-  mergeChatNodes: tool({
-    description: 'Merge multiple nodes into one',
-    parameters: z.object({
-      nodeIds: z.array(z.string()),
-      action: z.string(),
-    }),
-  }),
-  deleteChatNode: tool({
-    description: 'Delete a chat node',
-    parameters: z.object({
-      nodeId: z.string(),
-    }),
-  }),
-  updateChatNode: tool({
-    description: 'Update a chat node properties',
-    parameters: z.object({
-      nodeId: z.string(),
-      topic: z.string().optional(),
-      color: z.string().optional(),
-      label: z.string().optional(),
-    }),
-  }),
-  focusChatNode: tool({
-    description: 'Focus the viewport on a specific node',
-    parameters: z.object({
-      nodeId: z.string(),
-    }),
-  }),
-  renderChart: tool({
-    description: 'Render a chart in the chat',
-    parameters: z.object({
-      chartType: z.enum(['pie', 'bar', 'line']),
-      title: z.string().optional(),
-      data: z.array(z.object({ name: z.string(), value: z.number() })),
-    }),
-  }),
-  renderBranchProposal: tool({
-    description: 'Render a branch proposal card',
-    parameters: z.object({
-      parentNodeId: z.string().optional(),
-      parentTopic: z.string().optional(),
-      rationale: z.string().optional(),
-      options: z.array(z.object({ topic: z.string(), prompt: z.string().optional() })).optional(),
-    }),
-  }),
-  renderMergePlan: tool({
-    description: 'Render a merge plan card',
-    parameters: z.object({
-      title: z.string(),
-      nodeIds: z.array(z.string()),
-      rationale: z.string().optional(),
-    }),
-  }),
-};
-
 // Agent endpoint
 app.post('/api/agent', async (c) => {
   const { message, canvasState, threadId } = await c.req.json();
@@ -173,32 +99,10 @@ app.post('/api/agent', async (c) => {
   }
 
   // Build system prompt with canvas state
-  const systemPrompt = buildSystemPrompt(canvasState);
-
-  // Stream response
-  const result = streamText({
-    model,
-    system: systemPrompt,
-    messages: [{ role: 'user', content: message }],
-    tools: canvasTools,
-    maxSteps: 10,
-  });
-
-  // Return streaming response
-  return new Response(result.textStream, {
-    headers: {
-      'Content-Type': 'text/event-stream',
-      'Cache-Control': 'no-cache',
-      'Connection': 'keep-alive',
-    },
-  });
-});
-
-function buildSystemPrompt(canvasState: any): string {
   const nodeCount = canvasState.nodes?.length ?? 0;
   const edgeCount = canvasState.edges?.length ?? 0;
   
-  return `You are CaudalFlow AI Assistant, helping users manage their conversation canvas.
+  const systemPrompt = `You are CaudalFlow AI Assistant, helping users manage their conversation canvas.
 
 Current canvas state:
 - ${nodeCount} nodes
@@ -214,8 +118,24 @@ You can help users by:
 7. Rendering charts and visualizations
 8. Proposing branches and merge plans
 
-When the user asks you to do something with the canvas, use the appropriate tool.`;
-}
+When the user asks you to do something with the canvas, explain what you would do.`;
+
+  // Stream response
+  const result = streamText({
+    model,
+    system: systemPrompt,
+    messages: [{ role: 'user', content: message }],
+  });
+
+  // Return streaming response
+  return new Response(result.textStream, {
+    headers: {
+      'Content-Type': 'text/event-stream',
+      'Cache-Control': 'no-cache',
+      'Connection': 'keep-alive',
+    },
+  });
+});
 
 const port = Number(process.env.PORT ?? 4000);
 
