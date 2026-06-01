@@ -107,6 +107,23 @@ export function SettingsPanel() {
           </div>
         )}
 
+        {/* Endpoint URL - Show for custom provider */}
+        {config.providerId === 'custom' && (
+          <div>
+            <label className={labelClass}>{t('settings.endpoint')}</label>
+            <input
+              type="text"
+              value={config.endpoint}
+              onChange={(e) => updateConfig({ endpoint: e.target.value })}
+              className={inputClass}
+              placeholder="https://api.example.com/v1/chat/completions"
+            />
+            <p className="text-[10px] text-text-muted mt-1">
+              {t('settings.endpointDescription')}
+            </p>
+          </div>
+        )}
+
         {/* Model Config - Show for non-mock providers */}
         {config.providerId !== 'mock' && (
           <>
@@ -117,7 +134,7 @@ export function SettingsPanel() {
                 value={config.model}
                 onChange={(e) => updateConfig({ model: e.target.value })}
                 className={inputClass}
-                placeholder={config.providerId === 'openai' ? 'gpt-4o-mini' : 'claude-sonnet-4-20250514'}
+                placeholder={config.providerId === 'openai' ? 'gpt-4o-mini' : config.providerId === 'anthropic' ? 'claude-sonnet-4-20250514' : 'model-id'}
               />
             </div>
             <div>

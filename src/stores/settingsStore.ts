@@ -64,13 +64,15 @@ export const useSettingsStore = create<SettingsState>()(
 
         // When switching providers, set sensible defaults for endpoint and model
         if (config.providerId && config.providerId !== current.providerId) {
-          const defaults: Record<string, { model: string }> = {
-            openai: { model: 'gpt-4o-mini' },
-            anthropic: { model: 'claude-sonnet-4-5-20250929' },
+          const defaults: Record<string, { model: string; endpoint?: string }> = {
+            openai: { model: 'gpt-4o-mini', endpoint: 'https://api.openai.com/v1/chat/completions' },
+            anthropic: { model: 'claude-sonnet-4-5-20250929', endpoint: 'https://api.anthropic.com/v1/messages' },
+            custom: { model: '', endpoint: '' },
           };
           const d = defaults[config.providerId];
           if (d) {
             merged.model = d.model;
+            if (d.endpoint) merged.endpoint = d.endpoint;
           }
         }
 

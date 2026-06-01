@@ -9,6 +9,8 @@
     "apiKey": "API Key",
     "apiKeyPlaceholder": "Enter your API key",
     "apiKeyDescription": "Your API key is stored locally and sent directly to the provider.",
+    "endpoint": "API Endpoint URL",
+    "endpointDescription": "The API endpoint URL for OpenAI-compatible services.",
     "model": "Model",
     "temperature": "Temperature",
     "maxTokens": "Max Tokens",

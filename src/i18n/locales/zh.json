@@ -9,6 +9,8 @@
     "apiKey": "API 密钥",
     "apiKeyPlaceholder": "输入你的 API 密钥",
     "apiKeyDescription": "你的 API 密钥存储在本地，直接发送给提供商。",
+    "endpoint": "API 端点 URL",
+    "endpointDescription": "OpenAI 兼容服务的 API 端点 URL。",
     "model": "模型",
     "temperature": "温度",
     "maxTokens": "最大令牌数",
