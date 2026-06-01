@@ -49,7 +49,7 @@ export async function fetchModels(endpoint: string, apiKey: string): Promise<Mod
   }
 }
 
-export async function testConnection(endpoint: string, apiKey: string): Promise<{ success: boolean; message: string }> {
+export async function testConnection(endpoint: string, apiKey: string, model?: string): Promise<{ success: boolean; message: string }> {
   try {
     // Build chat completions endpoint
     let chatUrl: string;
@@ -61,6 +61,17 @@ export async function testConnection(endpoint: string, apiKey: string): Promise<
       chatUrl = endpoint.replace(/\/?$/, '') + '/v1/chat/completions';
     }
 
+    // Use provided model or fetch first available model
+    let testModel = model;
+    if (!testModel) {
+      const models = await fetchModels(endpoint, apiKey);
+      if (models.length > 0) {
+        testModel = models[0].id;
+      } else {
+        return { success: false, message: 'No models available. Please enter a model ID.' };
+      }
+    }
+
     const response = await fetch(chatUrl, {
       method: 'POST',
       headers: {
@@ -68,7 +79,7 @@ export async function testConnection(endpoint: string, apiKey: string): Promise<
         'Authorization': `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
-        model: 'test',
+        model: testModel,
         messages: [{ role: 'user', content: 'Hi' }],
         max_tokens: 1,
       }),

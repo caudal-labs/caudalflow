@@ -40,12 +40,12 @@ export function SettingsPanel() {
     setTestingConnection(true);
     setConnectionResult(null);
     try {
-      const result = await testConnection(config.endpoint, config.apiKey);
+      const result = await testConnection(config.endpoint, config.apiKey, config.model);
       setConnectionResult(result);
     } finally {
       setTestingConnection(false);
     }
-  }, [config.endpoint, config.apiKey]);
+  }, [config.endpoint, config.apiKey, config.model]);
 
   if (!showSettings) return null;
 
