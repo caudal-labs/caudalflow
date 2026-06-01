@@ -81,7 +81,6 @@ export async function testConnection(endpoint: string, apiKey: string, model?: s
       body: JSON.stringify({
         model: testModel,
         messages: [{ role: 'user', content: 'Hi' }],
-        max_tokens: 1,
       }),
     });
 
