@@ -64,7 +64,8 @@
     "renameWorkspace": "Rename workspace",
     "deleteWorkspace": "Delete workspace",
     "exportWorkspace": "Export Workspace",
-    "importWorkspace": "Import Workspace"
+    "importWorkspace": "Import Workspace",
+    "github": "View on GitHub"
   },
   "canvas": {
     "newChat": "New Chat",

@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ChevronDown, Plus, Trash2, Download, Upload, Check, Pencil } from 'lucide-react';
+import { ChevronDown, Plus, Trash2, Download, Upload, Check, Pencil, Github } from 'lucide-react';
 import { useWorkspaceStore } from '../../stores/workspaceStore';
 import { exportWorkspace, importWorkspace } from '../../hooks/usePersistence';
 
@@ -198,7 +198,7 @@ export function WorkspaceSelector() {
       {/* Spacer */}
       <div className="flex-1" />
 
-      {/* Right: export + import */}
+      {/* Right: export + import + github */}
       <div className="flex items-center gap-1">
         <button
           onClick={exportWorkspace}
@@ -214,6 +214,15 @@ export function WorkspaceSelector() {
         >
           <Upload size={15} />
         </button>
+        <a
+          href="https://github.com/yancongya/caudalflow"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="p-1.5 text-text-muted hover:text-text-primary transition-colors"
+          title={t('workspace.github')}
+        >
+          <Github size={15} />
+        </a>
         <input
           ref={fileRef}
           type="file"
