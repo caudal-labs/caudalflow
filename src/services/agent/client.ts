@@ -50,17 +50,17 @@ export class AgentClient {
             try {
               const event = JSON.parse(line.slice(6));
               onEvent(event);
-            } catch (e) {
+            } catch {
               // Skip invalid JSON
             }
           }
         }
       }
-    } catch (error: any) {
-      if (error.name === 'AbortError') return;
+    } catch (error: unknown) {
+      if (error instanceof Error && error.name === 'AbortError') return;
       onEvent({
         type: 'error',
-        data: { error: error.message },
+        data: { error: error instanceof Error ? error.message : String(error) },
       });
     }
   }

@@ -3,7 +3,8 @@
  */
 import { describe, it, expect, vi, beforeEach, afterEach, type Mock } from 'vitest';
 import { createRoot, type Root } from 'react-dom/client';
-import { act } from 'react-dom/test-utils';
+import { act } from 'react';
+import '../../../i18n';
 import { ChatNodeDeleteConfirmation } from '../ChatNodeDeleteConfirmation';
 
 describe('ChatNodeDeleteConfirmation', () => {
@@ -37,6 +38,7 @@ describe('ChatNodeDeleteConfirmation', () => {
       root.unmount();
     });
     container.remove();
+    vi.useRealTimers();
   });
 
   it('confirms deletion from the Delete button', () => {
@@ -81,8 +83,20 @@ describe('ChatNodeDeleteConfirmation', () => {
   });
 
   it('cancels when clicking outside the popup', () => {
+    vi.useFakeTimers();
     renderPopup();
 
+    // Advance past the 50ms delay so the mousedown handler is attached
+    act(() => {
+      vi.advanceTimersByTime(50);
+    });
+
+    // First mousedown is skipped by the component's skipFirst guard
+    act(() => {
+      document.body.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }));
+    });
+
+    // Second mousedown outside triggers cancel
     act(() => {
       document.body.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }));
     });

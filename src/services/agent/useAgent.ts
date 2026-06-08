@@ -33,7 +33,7 @@ export function useAgent() {
     await agentClient.sendMessage(message, canvasState, threadId, (event: AgentEvent) => {
       switch (event.type) {
         case 'text_delta':
-          assistantMessage += event.data.delta;
+          assistantMessage += (event.data as { delta: string }).delta;
           setMessages((prev) => {
             const newMessages = [...prev];
             const lastMsg = newMessages[newMessages.length - 1];
@@ -50,7 +50,7 @@ export function useAgent() {
           console.log('Tool call:', event.data);
           break;
         case 'error':
-          console.error('Agent error:', event.data.error);
+          console.error('Agent error:', (event.data as { error: string }).error);
           break;
       }
     });

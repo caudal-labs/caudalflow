@@ -140,32 +140,36 @@ const canvasTools = {
 
 // Agent endpoint
 app.post('/api/agent', async (c) => {
-  const { message, canvasState, threadId } = await c.req.json();
+  const { message, canvasState } = await c.req.json();
 
   const runtime = process.env.AGENT_RUNTIME ?? 'anthropic';
-  
+
   let apiKey: string | undefined;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let model: any;
 
   switch (runtime) {
-    case 'anthropic':
+    case 'anthropic': {
       apiKey = process.env.ANTHROPIC_API_KEY;
       if (!apiKey) return c.json({ error: 'Missing ANTHROPIC_API_KEY' }, 500);
       const anthropic = createAnthropic({ apiKey });
       model = anthropic('claude-sonnet-4-20250514');
       break;
-    case 'openai':
+    }
+    case 'openai': {
       apiKey = process.env.OPENAI_API_KEY;
       if (!apiKey) return c.json({ error: 'Missing OPENAI_API_KEY' }, 500);
       const openai = createOpenAI({ apiKey });
       model = openai('gpt-4o-mini');
       break;
-    case 'gemini':
+    }
+    case 'gemini': {
       apiKey = process.env.GEMINI_API_KEY;
       if (!apiKey) return c.json({ error: 'Missing GEMINI_API_KEY' }, 500);
       const google = createGoogleGenerativeAI({ apiKey });
       model = google('gemini-2.0-flash');
       break;
+    }
     default:
       return c.json({ error: `Unknown runtime: ${runtime}` }, 400);
   }
@@ -192,7 +196,7 @@ app.post('/api/agent', async (c) => {
   });
 });
 
-function buildSystemPrompt(canvasState: any): string {
+function buildSystemPrompt(canvasState: Record<string, unknown>): string {
   const nodeCount = canvasState.nodes?.length ?? 0;
   const edgeCount = canvasState.edges?.length ?? 0;
   

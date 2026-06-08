@@ -129,7 +129,7 @@ export function Canvas() {
   );
 
   const handleConnectEnd = useCallback(
-    (event: MouseEvent | TouchEvent, connectionState: any) => {
+    (event: MouseEvent | TouchEvent, connectionState: { toNode: unknown; fromNode?: { id: string } | null }) => {
       // If we're not connecting to a valid target, create a new node
       if (connectionState.toNode) return;
       

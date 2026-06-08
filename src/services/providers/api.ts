@@ -30,15 +30,15 @@ export async function fetchModels(endpoint: string, apiKey: string): Promise<Mod
     
     // Handle different response formats
     if (Array.isArray(data)) {
-      return data.map((m: any) => ({
-        id: m.id || m.name,
-        name: m.name || m.id,
+      return data.map((m: { id?: string; name?: string }) => ({
+        id: m.id || m.name || '',
+        name: m.name || m.id || '',
       }));
     }
     if (data.data && Array.isArray(data.data)) {
-      return data.data.map((m: any) => ({
-        id: m.id || m.name,
-        name: m.name || m.id,
+      return data.data.map((m: { id?: string; name?: string }) => ({
+        id: m.id || m.name || '',
+        name: m.name || m.id || '',
       }));
     }
     
@@ -104,10 +104,13 @@ export async function testConnection(endpoint: string, apiKey: string, model?: s
       success: false, 
       message: errorData.error?.message || `Error: ${response.status}` 
     };
-  } catch (error: any) {
-    if (error.name === 'TypeError' && error.message.includes('fetch')) {
-      return { success: false, message: 'Cannot reach endpoint (CORS or network error)' };
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      if (error.name === 'TypeError' && error.message.includes('fetch')) {
+        return { success: false, message: 'Cannot reach endpoint (CORS or network error)' };
+      }
+      return { success: false, message: error.message || 'Connection failed' };
     }
-    return { success: false, message: error.message || 'Connection failed' };
+    return { success: false, message: 'Connection failed' };
   }
 }

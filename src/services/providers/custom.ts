@@ -97,7 +97,7 @@ export const CustomProvider: LLMProvider = {
             if (content) {
               callbacks.onToken(content);
             }
-          } catch (e) {
+          } catch {
             continue;
           }
         }

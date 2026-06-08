@@ -86,7 +86,7 @@ Adding a new provider is four files and zero changes to the rest of the app — 
 
 ### Workspaces
 
-Organize your explorations into separate workspaces. Each workspace persists its full state — nodes, edges, conversations, positions — to localStorage. Export and import workspaces as JSON files.
+Organize your explorations into separate workspaces. Each workspace persists its full state — nodes, edges, conversations, positions — to localStorage. Export and import workspaces as JSON, or export as Markdown for sharing and documentation.
 
 ### Theme System
 
@@ -365,6 +365,9 @@ See the [step-by-step guide in CONTRIBUTING.md](CONTRIBUTING.md#adding-a-new-llm
 - **Node Collapse** — Collapsed nodes show as small cards, expand on click
 - **Connect to Create** — Drag from node handle to empty area to create connected node
 - **Tooltips** — All toolbar buttons have descriptive hover tooltips
+- **Markdown Export** — Export workspaces or selected nodes as Markdown for sharing and documentation
+- **GitHub Link** — Quick link to the repository from the top navigation bar
+- **Lint & Test Fixes** — Resolved 27 lint errors, added missing i18n dependencies, fixed broken test suite
 
 ### v2.0.0
 

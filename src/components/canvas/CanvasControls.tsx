@@ -19,9 +19,7 @@ import { Tooltip } from '../ui/Tooltip';
 import { calculateAutoLayoutPositions } from '../../utils/nodeLayout';
 import { useFlowStore } from '../../stores/flowStore';
 
-interface CanvasControlsProps {}
-
-export function CanvasControls({}: CanvasControlsProps) {
+export function CanvasControls() {
   const { t } = useTranslation();
   const { zoomIn, zoomOut, fitView, getViewport } = useReactFlow();
   const toggleSettings = useSettingsStore((s) => s.toggleSettings);

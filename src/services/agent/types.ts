@@ -9,18 +9,18 @@ export interface AgentMessage {
 export interface ToolCall {
   id: string;
   name: string;
-  args: Record<string, any>;
+  args: Record<string, unknown>;
 }
 
 export interface ToolResult {
   toolCallId: string;
-  result: any;
+  result: unknown;
 }
 
 export interface CanvasState {
-  nodes: any[];
-  edges: any[];
-  conversations: Record<string, any>;
+  nodes: unknown[];
+  edges: unknown[];
+  conversations: Record<string, unknown>;
   activeNodeId?: string;
   selectedNodeIds?: string[];
   mergeContext?: {
@@ -51,5 +51,5 @@ export type AgentEventType =
 
 export interface AgentEvent {
   type: AgentEventType;
-  data: any;
+  data: unknown;
 }

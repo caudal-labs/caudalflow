@@ -16,10 +16,6 @@ function buildNodeTree(
 ): Map<string, ChatNode[]> {
   const tree = new Map<string, ChatNode[]>();
   
-  // Find root nodes (no incoming edges)
-  const targetIds = new Set(edges.map(e => e.target));
-  const rootNodes = nodes.filter(n => !targetIds.has(n.id));
-  
   // Build parent -> children mapping
   for (const edge of edges) {
     if (!tree.has(edge.source)) {
