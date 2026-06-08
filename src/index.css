@@ -1,59 +1,111 @@
 @import "tailwindcss";
 @import "@xyflow/react/dist/style.css";
 
+/* Theme colors using CSS variables for theme switching */
 @theme {
-  --color-surface-900: #171717;
-  --color-surface-800: #262626;
-  --color-surface-700: #404040;
-  --color-surface-600: #525252;
-  --color-accent-500: #6366f1;
-  --color-accent-400: #818cf8;
-  --color-accent-600: #4f46e5;
+  --color-surface-950: var(--surface-950);
+  --color-surface-900: var(--surface-900);
+  --color-surface-800: var(--surface-800);
+  --color-surface-700: var(--surface-700);
+  --color-surface-600: var(--surface-600);
+  --color-accent-500: var(--accent-500);
+  --color-accent-400: var(--accent-400);
+  --color-accent-600: var(--accent-600);
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-muted: var(--text-muted);
+  --color-border: var(--border-color);
+  --color-border-hover: var(--border-hover);
+}
+
+/* Dark theme (default) */
+:root,
+[data-theme="dark"] {
+  --surface-950: #0a0a0a;
+  --surface-900: #171717;
+  --surface-800: #262626;
+  --surface-700: #404040;
+  --surface-600: #525252;
+  --accent-500: #6366f1;
+  --accent-400: #818cf8;
+  --accent-600: #4f46e5;
+
+  --bg-primary: #0a0a0a;
+  --bg-secondary: #171717;
+  --bg-tertiary: #262626;
+  --text-primary: #e5e5e5;
+  --text-secondary: #a3a3a3;
+  --text-muted: #737373;
+  --border-color: #262626;
+  --border-hover: #404040;
+}
+
+/* Light theme */
+[data-theme="light"] {
+  --surface-950: #f9fafb;
+  --surface-900: #ffffff;
+  --surface-800: #f5f5f5;
+  --surface-700: #e5e5e5;
+  --surface-600: #d4d4d6;
+  --accent-500: #6366f1;
+  --accent-400: #818cf8;
+  --accent-600: #4f46e5;
+
+  --bg-primary: #ffffff;
+  --bg-secondary: #f9fafb;
+  --bg-tertiary: #f3f4f6;
+  --text-primary: #111827;
+  --text-secondary: #6b7280;
+  --text-muted: #9ca3af;
+  --border-color: #e5e7eb;
+  --border-hover: #d1d5db;
 }
 
 html, body, #root {
   height: 100%;
   margin: 0;
   padding: 0;
-  background-color: #0a0a0a;
-  color: #e5e5e5;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  transition: background-color 0.2s, color 0.2s;
 }
 
+/* React Flow styles */
 .react-flow__background {
-  background-color: #0a0a0a !important;
+  background-color: var(--bg-primary) !important;
 }
 
 .react-flow__minimap {
-  background-color: #171717 !important;
+  background-color: var(--bg-secondary) !important;
   border-radius: 8px;
-  border: 1px solid #262626;
+  border: 1px solid var(--border-color);
 }
 
 .react-flow__controls {
   border-radius: 8px;
-  border: 1px solid #262626;
+  border: 1px solid var(--border-color);
   overflow: hidden;
 }
 
 .react-flow__controls-button {
-  background-color: #171717 !important;
-  border-color: #262626 !important;
-  color: #a3a3a3 !important;
-  fill: #a3a3a3 !important;
+  background-color: var(--bg-secondary) !important;
+  border-color: var(--border-color) !important;
+  color: var(--text-secondary) !important;
+  fill: var(--text-secondary) !important;
 }
 
 .react-flow__controls-button:hover {
-  background-color: #262626 !important;
-  color: #e5e5e5 !important;
-  fill: #e5e5e5 !important;
+  background-color: var(--bg-tertiary) !important;
+  color: var(--text-primary) !important;
+  fill: var(--text-primary) !important;
 }
 
 .react-flow__resize-control.handle {
   width: 8px !important;
   height: 8px !important;
   border-radius: 2px !important;
-  background-color: #6366f1 !important;
+  background-color: var(--accent-500) !important;
   border: none !important;
 }
 
@@ -61,7 +113,6 @@ html, body, #root {
   transition: transform 300ms ease-out;
 }
 
-/* Re-enable text selection inside message areas (React Flow sets user-select: none on nodes) */
 .react-flow__node .select-text,
 .react-flow__node .select-text * {
   user-select: text;
@@ -70,7 +121,7 @@ html, body, #root {
 
 ::selection {
   background-color: rgba(99, 102, 241, 0.4);
-  color: #e5e5e5;
+  color: var(--text-primary);
 }
 
 ::-webkit-scrollbar {
@@ -82,10 +133,10 @@ html, body, #root {
 }
 
 ::-webkit-scrollbar-thumb {
-  background-color: #404040;
+  background-color: var(--border-hover);
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background-color: #525252;
+  background-color: var(--text-muted);
 }

@@ -1,4 +1,5 @@
 import { useEffect, useRef, useCallback } from 'react';
+import i18n from '../i18n';
 import { useFlowStore } from '../stores/flowStore';
 import { useChatStore } from '../stores/chatStore';
 import { useWorkspaceStore } from '../stores/workspaceStore';
@@ -84,7 +85,7 @@ function loadFromStorage(workspaceId: string) {
     const y = (window.innerHeight - nodeH) / 2;
     const nodeId = useFlowStore.getState().addChatNode(
       { x, y },
-      { topic: 'New Chat', collapsed: false }
+      { topic: i18n.t('canvas.newChat'), collapsed: false }
     );
     useChatStore.getState().initConversation(nodeId);
   }

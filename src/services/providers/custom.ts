@@ -1,32 +1,30 @@
 import type { LLMProvider, StreamCallbacks } from './types';
 import type { ChatMessage, LLMConfig } from '../../types/chat';
 
-function toAnthropicMessages(messages: ChatMessage[]) {
+function toOpenAIMessages(messages: ChatMessage[]) {
   return messages.map((m) => {
     if (m.images && m.images.length > 0) {
       return {
         role: m.role,
         content: [
+          ...(m.content ? [{ type: 'text', text: m.content }] : []),
           ...m.images.map((img) => ({
-            type: 'image',
-            source: {
-              type: 'base64',
-              media_type: img.mimeType,
-              data: img.base64,
+            type: 'image_url',
+            image_url: {
+              url: `data:${img.mimeType};base64,${img.base64}`,
             },
           })),
-          ...(m.content ? [{ type: 'text', text: m.content }] : []),
         ],
       };
     }
-
     return { role: m.role, content: m.content };
   });
 }
 
-export const AnthropicProvider: LLMProvider = {
-  id: 'anthropic',
-  name: 'Anthropic',
+export const CustomProvider: LLMProvider = {
+  id: 'custom',
+  name: 'Custom (OpenAI Compatible)',
+  supportsVision: true,
 
   async streamChat(
     messages: ChatMessage[],
@@ -34,29 +32,30 @@ export const AnthropicProvider: LLMProvider = {
     callbacks: StreamCallbacks,
     signal: AbortSignal
   ) {
-    // Anthropic expects system as a top-level field, not in the messages array
-    const systemMessages = messages.filter((m) => m.role === 'system');
-    const nonSystemMessages = messages.filter((m) => m.role !== 'system');
+    // Build chat completions endpoint from base URL
+    let chatUrl: string;
+    if (config.endpoint.includes('/chat/completions')) {
+      chatUrl = config.endpoint;
+    } else if (config.endpoint.endsWith('/v1') || config.endpoint.endsWith('/v1/')) {
+      chatUrl = config.endpoint.replace(/\/?$/, '') + '/chat/completions';
+    } else {
+      chatUrl = config.endpoint.replace(/\/?$/, '') + '/v1/chat/completions';
+    }
 
-    const body: Record<string, unknown> = {
+    const body = {
       model: config.model,
-      messages: toAnthropicMessages(nonSystemMessages),
-      max_tokens: config.maxTokens,
+      messages: toOpenAIMessages(messages),
       temperature: config.temperature,
+      max_tokens: config.maxTokens,
       stream: true,
     };
 
-    if (systemMessages.length > 0) {
-      body.system = systemMessages.map((m) => m.content).join('\n\n');
-    }
-
     try {
-      const response = await fetch('/api/llm', {
+      const response = await fetch(chatUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'x-llm-provider': 'anthropic',
-          'x-api-key': config.apiKey || '',
+          'Authorization': `Bearer ${config.apiKey}`,
         },
         body: JSON.stringify(body),
         signal,
@@ -87,32 +86,19 @@ export const AnthropicProvider: LLMProvider = {
           if (!trimmed || !trimmed.startsWith('data: ')) continue;
           const data = trimmed.slice(6);
 
+          if (data === '[DONE]') {
+            callbacks.onDone();
+            return;
+          }
+
           try {
             const parsed = JSON.parse(data);
-
-            if (parsed.type === 'content_block_delta' && parsed.delta?.type === 'text_delta') {
-              callbacks.onToken(parsed.delta.text);
-            }
-
-            if (parsed.type === 'message_stop') {
-              callbacks.onDone();
-              return;
-            }
-
-            if (parsed.type === 'error') {
-              throw new Error(parsed.error?.message ?? 'Unknown stream error');
+            const content = parsed.choices?.[0]?.delta?.content;
+            if (content) {
+              callbacks.onToken(content);
             }
           } catch (e) {
-            if (e instanceof Error && e.message.startsWith('API error')) throw e;
-
-            if (e instanceof Error && e.message !== 'Unknown stream error' &&
-                !e.message.includes('stream error')) {
-              continue;
-            }
-
-            if (e instanceof Error) {
-              throw e;
-            }
+            continue;
           }
         }
       }

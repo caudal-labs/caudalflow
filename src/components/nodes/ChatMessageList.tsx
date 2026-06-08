@@ -1,4 +1,5 @@
 import { useRef, useMemo, useState, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { GitBranch } from 'lucide-react';
 import { useChatStore } from '../../stores/chatStore';
 import { useFlowStore } from '../../stores/flowStore';
@@ -14,6 +15,7 @@ interface ChatMessageListProps {
 }
 
 export function ChatMessageList({ nodeId, onExplore }: ChatMessageListProps) {
+  const { t } = useTranslation();
   const allMessages = useChatStore((s) => s.conversations[nodeId]?.messages ?? []);
   const showSystemPrompts = useSettingsStore((s) => s.showSystemPrompts);
   const messages = useMemo(
@@ -58,8 +60,8 @@ export function ChatMessageList({ nodeId, onExplore }: ChatMessageListProps) {
         onMouseUp={onMouseUp}
       >
         {messages.length === 0 ? (
-          <div className="flex items-center justify-center h-full text-neutral-500 text-sm px-4 text-center">
-            Ask a question to start exploring
+          <div className="flex items-center justify-center h-full text-text-muted text-sm px-4 text-center">
+            {t('chat.askQuestionToStart')}
           </div>
         ) : (
           <div className="py-2 space-y-1">
@@ -86,10 +88,10 @@ export function ChatMessageList({ nodeId, onExplore }: ChatMessageListProps) {
               setPopupOpen(true);
             }}
             className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-accent-500/60 bg-accent-600 shadow-lg shadow-black/50 text-white hover:bg-accent-500 transition-colors"
-            title="Branch from selection"
+            title={t('selection.branchFromSelection')}
           >
             <GitBranch size={14} />
-            <span className="text-xs font-semibold">Branch</span>
+            <span className="text-xs font-semibold">{t('selection.branch')}</span>
           </button>
         </div>
       )}

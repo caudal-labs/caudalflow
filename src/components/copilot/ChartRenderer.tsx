@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import {
   PieChart, Pie, Cell, Tooltip, Legend,
   BarChart, Bar, XAxis, YAxis, CartesianGrid,
@@ -24,20 +25,21 @@ interface ChartRendererProps {
 }
 
 export function ChartRenderer({ args }: ChartRendererProps) {
+  const { t } = useTranslation();
   const { chartType = 'pie', title, data = [] } = args;
 
   if (data.length === 0) {
     return (
-      <div className="my-2 rounded-lg border border-neutral-700 bg-neutral-900 p-3 text-xs text-neutral-400">
-        No chart data provided.
+      <div className="my-2 rounded-lg border border-border bg-surface-950 p-3 text-xs text-text-secondary">
+        {t('chart.noData')}
       </div>
     );
   }
 
   return (
-    <div className="my-2 rounded-lg border border-neutral-700 bg-neutral-900 p-3 text-neutral-100 shadow-lg">
+    <div className="my-2 rounded-lg border border-border bg-surface-950 p-3 text-text-primary shadow-lg">
       {title && (
-        <div className="mb-3 text-sm font-semibold text-neutral-100">{title}</div>
+        <div className="mb-3 text-sm font-semibold text-text-primary">{title}</div>
       )}
       <ResponsiveContainer width="100%" height={240}>
         {chartType === 'pie' ? (

@@ -107,8 +107,8 @@ export const ChatMessage = memo(function ChatMessage({
   if (isSystem) {
     return (
       <div className="px-3 py-1.5">
-        <div className="text-[11px] leading-relaxed text-neutral-500 bg-neutral-800/50 border border-neutral-700/30 rounded-lg px-3 py-2 italic">
-          <span className="text-neutral-400 font-medium not-italic text-[10px] uppercase tracking-wider">System</span>
+        <div className="text-[11px] leading-relaxed text-text-muted bg-surface-800 border border-border rounded-lg px-3 py-2 italic">
+          <span className="text-text-secondary font-medium not-italic text-[10px] uppercase tracking-wider">System</span>
           <div className="mt-1 whitespace-pre-wrap">{message.content}</div>
         </div>
       </div>
@@ -125,7 +125,7 @@ export const ChatMessage = memo(function ChatMessage({
         className={`relative group text-sm leading-relaxed ${
           isUser
             ? 'bg-accent-600 text-white rounded-2xl rounded-br-md px-3 py-2 pr-7 max-w-[85%] inline-block'
-            : 'text-neutral-200 prose-invert prose-sm max-w-none pr-7'
+            : 'text-text-primary prose-invert prose-sm max-w-none pr-7'
         }`}
       >
         <button
@@ -133,7 +133,7 @@ export const ChatMessage = memo(function ChatMessage({
           aria-label={copied ? 'Copied message' : 'Copy message'}
           data-state={copied ? 'copied' : 'idle'}
           onClick={handleCopy}
-          className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity text-neutral-500 hover:text-neutral-300"
+          className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity text-text-muted hover:text-text-primary"
         >
           {copied ? <Check size={14} /> : <Copy size={14} />}
         </button>
@@ -147,7 +147,7 @@ export const ChatMessage = memo(function ChatMessage({
                     key={i}
                     src={url}
                     onClick={() => setLightbox(url)}
-                    className="max-w-25 sm:max-w-25 rounded-lg cursor-pointer border border-neutral-700 hover:opacity-90 transition"
+                    className="max-w-25 sm:max-w-25 rounded-lg cursor-pointer border border-border hover:opacity-90 transition"
                   />
                 );
               })}
@@ -178,7 +178,7 @@ export const ChatMessage = memo(function ChatMessage({
                 }
                 return (
                   <code
-                    className="bg-neutral-700/50 px-1 py-0.5 rounded text-xs"
+                    className="bg-surface-700 px-1 py-0.5 rounded text-xs"
                     {...props}
                   >
                     {children}
@@ -190,14 +190,14 @@ export const ChatMessage = memo(function ChatMessage({
               },
               h2({ children }) {
                 return (
-                  <h2 className="text-sm font-semibold text-neutral-100 mt-3 mb-1">
+                  <h2 className="text-sm font-semibold text-text-primary mt-3 mb-1">
                     {withHighlights(children)}
                   </h2>
                 );
               },
               h3({ children }) {
                 return (
-                  <h3 className="text-sm font-medium text-neutral-100 mt-2 mb-1">
+                  <h3 className="text-sm font-medium text-text-primary mt-2 mb-1">
                     {withHighlights(children)}
                   </h3>
                 );
@@ -215,7 +215,7 @@ export const ChatMessage = memo(function ChatMessage({
               },
               blockquote({ children }) {
                 return (
-                  <blockquote className="border-l-2 border-accent-500 pl-3 my-2 text-neutral-400 italic">
+                  <blockquote className="border-l-2 border-accent-500 pl-3 my-2 text-text-secondary italic">
                     {children}
                   </blockquote>
                 );
@@ -231,20 +231,20 @@ export const ChatMessage = memo(function ChatMessage({
               },
               th({ children }) {
                 return (
-                  <th className="border border-neutral-600 px-2 py-1 bg-neutral-800 text-left font-medium">
+                  <th className="border border-border-hover px-2 py-1 bg-surface-800 text-left font-medium">
                     {withHighlights(children)}
                   </th>
                 );
               },
               td({ children }) {
                 return (
-                  <td className="border border-neutral-700 px-2 py-1">
+                  <td className="border border-border px-2 py-1">
                     {withHighlights(children)}
                   </td>
                 );
               },
               strong({ children }) {
-                return <strong className="font-semibold text-neutral-100">{withHighlights(children)}</strong>;
+                return <strong className="font-semibold text-text-primary">{withHighlights(children)}</strong>;
               },
               a({ href, children }) {
                 return (

@@ -42,7 +42,7 @@ export function TopicEdge({
       {label && (
         <EdgeLabelRenderer>
           <div
-            className="absolute pointer-events-all px-2 py-0.5 text-[10px] rounded-full border bg-surface-800 border-neutral-700 text-neutral-400 truncate max-w-[150px] hover:max-w-[300px] hover:text-neutral-200 transition-all"
+            className="absolute pointer-events-all px-2 py-0.5 text-[10px] rounded-full border bg-surface-800 border-border text-text-secondary truncate max-w-[150px] hover:max-w-[300px] hover:text-text-primary transition-all"
             style={{
               transform: `translate(-50%, -50%) translate(${labelX}px, ${labelY}px)`,
             }}

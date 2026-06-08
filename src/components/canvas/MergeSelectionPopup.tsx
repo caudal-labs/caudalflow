@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { ArrowRight, GitMerge, Sparkles, Link, FileText } from 'lucide-react';
 
 interface MergeSelectionPopupProps {
@@ -8,12 +9,13 @@ interface MergeSelectionPopupProps {
 }
 
 export function MergeSelectionPopup({ topics, onMerge, onDismiss }: MergeSelectionPopupProps) {
+  const { t } = useTranslation();
   const [input, setInput] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    const t = setTimeout(() => inputRef.current?.focus(), 50);
-    return () => clearTimeout(t);
+    const timer = setTimeout(() => inputRef.current?.focus(), 50);
+    return () => clearTimeout(timer);
   }, []);
 
   useEffect(() => {
@@ -47,8 +49,8 @@ export function MergeSelectionPopup({ topics, onMerge, onDismiss }: MergeSelecti
       <div className="px-3 pt-2.5 pb-2">
         <div className="flex items-center gap-1.5 mb-2">
           <GitMerge size={14} className="text-accent-400 shrink-0" />
-          <span className="text-xs font-medium text-neutral-300">
-            Merge {topics.length} nodes
+          <span className="text-xs font-medium text-text-secondary">
+            {t('merge.mergeNodes', { count: topics.length })}
           </span>
         </div>
 
@@ -71,12 +73,12 @@ export function MergeSelectionPopup({ topics, onMerge, onDismiss }: MergeSelecti
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="What should I do with these?"
-            className="flex-1 min-w-0 bg-neutral-800/80 text-sm text-neutral-200 rounded-md px-2.5 py-1.5 placeholder-neutral-500 border border-neutral-700/50 focus:border-accent-500/50 focus:outline-none transition-colors"
+            placeholder={t('merge.placeholder')}
+            className="flex-1 min-w-0 bg-surface-800 text-sm text-text-primary rounded-md px-2.5 py-1.5 placeholder-text-muted border border-border focus:border-accent-500/50 focus:outline-none transition-colors"
           />
           <button
             className="shrink-0 p-1.5 rounded-md bg-accent-500/20 text-accent-400 hover:bg-accent-500/30 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
-            title="Send"
+            title={t('merge.send')}
             disabled={!input.trim()}
             onClick={(e) => {
               e.stopPropagation();
@@ -88,36 +90,36 @@ export function MergeSelectionPopup({ topics, onMerge, onDismiss }: MergeSelecti
         </div>
       </div>
 
-      <div className="border-t border-neutral-700/30 px-1.5 py-1 flex gap-0.5">
+      <div className="border-t border-border px-1.5 py-1 flex gap-0.5">
         <button
-          className="flex items-center gap-1.5 text-xs text-neutral-400 hover:text-accent-400 hover:bg-accent-500/10 rounded-md px-2 py-1 transition-colors"
+          className="flex items-center gap-1.5 text-xs text-text-secondary hover:text-accent-400 hover:bg-accent-500/10 rounded-md px-2 py-1 transition-colors"
           onClick={(e) => {
             e.stopPropagation();
             submit('Compare these');
           }}
         >
           <Sparkles size={12} />
-          <span>Compare</span>
+          <span>{t('merge.compare')}</span>
         </button>
         <button
-          className="flex items-center gap-1.5 text-xs text-neutral-400 hover:text-accent-400 hover:bg-accent-500/10 rounded-md px-2 py-1 transition-colors"
+          className="flex items-center gap-1.5 text-xs text-text-secondary hover:text-accent-400 hover:bg-accent-500/10 rounded-md px-2 py-1 transition-colors"
           onClick={(e) => {
             e.stopPropagation();
             submit('Summarize together');
           }}
         >
           <FileText size={12} />
-          <span>Summarize</span>
+          <span>{t('merge.summarize')}</span>
         </button>
         <button
-          className="flex items-center gap-1.5 text-xs text-neutral-400 hover:text-accent-400 hover:bg-accent-500/10 rounded-md px-2 py-1 transition-colors"
+          className="flex items-center gap-1.5 text-xs text-text-secondary hover:text-accent-400 hover:bg-accent-500/10 rounded-md px-2 py-1 transition-colors"
           onClick={(e) => {
             e.stopPropagation();
             submit('Find connections');
           }}
         >
           <Link size={12} />
-          <span>Connections</span>
+          <span>{t('merge.connections')}</span>
         </button>
       </div>
     </div>
