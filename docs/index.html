@@ -1,0 +1,2193 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="CaudalFlow — a visual canvas for AI conversations. Branch, explore in parallel, merge insights. Play with a live slice of it right on this page." />
+  <title>CaudalFlow — Branch. Explore. Merge.</title>
+  <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
+  <style>
+/* CaudalFlow landing v2 — "Play the Canvas". Tokens match product theme. */
+
+:root,
+html[data-theme="dark"] {
+  --bg: #0a0a0a;
+  --surface-1: #171717;
+  --surface-2: #262626;
+  --surface-3: #404040;
+  --text: #e5e5e5;
+  --text-secondary: #a3a3a3;
+  --text-muted: #a3a3a3;
+  --accent: #6366f1;
+  --accent-soft: #818cf8;
+  --accent-deep: #4f46e5;
+  --border: #262626;
+  --border-hover: #404040;
+  --edge: #525252;
+  --edge-active: #818cf8;
+  --glow: rgba(99, 102, 241, 0.35);
+  --shadow: 0 18px 50px rgba(0, 0, 0, 0.45);
+  --chip-bg: #171717;
+  --focus: #818cf8;
+  --bad: #f87171;
+  --good: #34d399;
+  --amber: #fbbf24;
+  --canvas-dot: rgba(163, 163, 163, 0.16);
+  color-scheme: dark;
+}
+
+html[data-theme="light"] {
+  --bg: #ffffff;
+  --surface-1: #f9fafb;
+  --surface-2: #f3f4f6;
+  --surface-3: #e5e7eb;
+  --text: #111827;
+  --text-secondary: #4b5563;
+  --text-muted: #6b7280;
+  --accent: #6366f1;
+  --accent-soft: #4f46e5;
+  --accent-deep: #4338ca;
+  --border: #e5e7eb;
+  --border-hover: #d1d5db;
+  --edge: #d1d5db;
+  --edge-active: #6366f1;
+  --glow: rgba(99, 102, 241, 0.22);
+  --shadow: 0 18px 50px rgba(15, 23, 42, 0.1);
+  --chip-bg: #f3f4f6;
+  --focus: #4f46e5;
+  --bad: #dc2626;
+  --good: #059669;
+  --amber: #d97706;
+  --canvas-dot: rgba(55, 65, 81, 0.14);
+  color-scheme: light;
+}
+
+/* Product node color tags */
+.pnode[data-color="#22c55e"] { --node-color: #22c55e; }
+.pnode[data-color="#3b82f6"] { --node-color: #3b82f6; }
+.pnode[data-color="#f59e0b"] { --node-color: #f59e0b; }
+.pnode[data-color="#ef4444"] { --node-color: #ef4444; }
+.pnode[data-color="#a855f7"] { --node-color: #a855f7; }
+.pnode[data-color="#06b6d4"] { --node-color: #06b6d4; }
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  overflow-x: hidden;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+body {
+  margin: 0;
+  min-height: 100%;
+  overflow-x: hidden;
+  background: var(--bg);
+  color: var(--text);
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+img,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+
+ul,
+ol {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+h1,
+h2,
+h3,
+p {
+  margin: 0;
+}
+
+code,
+pre {
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+}
+
+.hidden {
+  display: none !important;
+}
+
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  background: var(--accent);
+  color: #fff;
+  padding: 0.5rem 1rem;
+  z-index: 100;
+}
+
+.skip-link:focus {
+  left: 1rem;
+  top: 1rem;
+}
+
+.container {
+  width: min(1120px, calc(100% - 2.5rem));
+  margin-inline: auto;
+}
+
+.container-wide {
+  width: min(1240px, calc(100% - 2rem));
+  margin-inline: auto;
+}
+
+:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
+/* ——— Nav ——— */
+
+.nav {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  backdrop-filter: blur(12px);
+  background: color-mix(in srgb, var(--bg) 82%, transparent);
+  border-bottom: 1px solid var(--border);
+}
+
+.nav-inner {
+  width: min(1240px, calc(100% - 2rem));
+  margin-inline: auto;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.brand-mark {
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.mark-bg { fill: var(--surface-3); }
+.mark-accent { fill: var(--accent); }
+.mark-accent-soft { fill: var(--accent-soft); }
+.mark-edge { stroke: var(--surface-1); }
+
+.nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 40px;
+  height: 36px;
+  padding: 0 0.7rem;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--surface-1);
+  color: var(--text-secondary);
+  font-size: 0.8125rem;
+  transition: color 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+}
+
+.icon-btn:hover {
+  color: var(--text);
+  border-color: var(--border-hover);
+  background: var(--surface-2);
+}
+
+/* ——— Buttons ——— */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  min-height: 44px;
+  padding: 0 1.15rem;
+  border-radius: 999px;
+  font-size: 0.9375rem;
+  font-weight: 550;
+  border: 1px solid transparent;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+  white-space: nowrap;
+}
+
+.btn-sm {
+  height: 36px;
+  min-height: 36px;
+  padding: 0 0.85rem;
+  font-size: 0.8125rem;
+}
+
+.btn-primary {
+  background: var(--accent);
+  color: #fff;
+}
+
+.btn-primary:hover {
+  background: var(--accent-deep);
+  transform: translateY(-1px);
+  box-shadow: 0 8px 28px var(--glow);
+}
+
+.btn-primary:active {
+  transform: scale(0.98);
+}
+
+.btn-secondary {
+  background: transparent;
+  border-color: var(--border-hover);
+  color: var(--text);
+}
+
+.btn-secondary:hover {
+  border-color: var(--accent-soft);
+  color: var(--accent-soft);
+  transform: translateY(-1px);
+}
+
+.btn-secondary:active {
+  transform: scale(0.98);
+}
+
+.btn-ghost {
+  background: var(--surface-1);
+  border-color: var(--border);
+  color: var(--text-secondary);
+  height: 36px;
+}
+
+.btn-ghost:hover {
+  color: var(--text);
+  border-color: var(--border-hover);
+  background: var(--surface-2);
+}
+
+.link-btn {
+  color: var(--accent-soft);
+  font-weight: 550;
+  margin-left: 0.4rem;
+}
+
+.link-btn:hover {
+  text-decoration: underline;
+}
+
+/* ——— Hero ——— */
+
+.hero {
+  padding: 4.5rem 0 2.5rem;
+  background:
+    radial-gradient(ellipse 60% 40% at 50% -10%, color-mix(in srgb, var(--accent) 12%, transparent), transparent 70%),
+    var(--bg);
+}
+
+.hero-inner {
+  max-width: 760px;
+}
+
+.eyebrow {
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent-soft);
+  margin-bottom: 1rem;
+}
+
+.hero-title {
+  font-size: clamp(1.75rem, 7vw, 3.25rem);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.15;
+  margin-bottom: 1.1rem;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+}
+
+.hero-sub {
+  font-size: clamp(1rem, 2vw, 1.125rem);
+  color: var(--text-secondary);
+  max-width: 58ch;
+  margin-bottom: 1.75rem;
+  overflow-wrap: anywhere;
+}
+
+.hero-ctas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+/* ——— Sections ——— */
+
+.section {
+  padding: 4.5rem 0;
+}
+
+.section-title {
+  font-size: clamp(1.55rem, 3.2vw, 2.2rem);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.15;
+  margin-bottom: 1rem;
+  max-width: 26ch;
+}
+
+.section-body {
+  color: var(--text-secondary);
+  max-width: 58ch;
+  margin-bottom: 2rem;
+}
+
+/* ——— Playground header & mission ——— */
+
+.playground {
+  padding-top: 3rem;
+}
+
+.play-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem 2rem;
+  margin-bottom: 1.25rem;
+}
+
+.play-copy .section-body {
+  margin-bottom: 0;
+}
+
+.mission {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.mission-step {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  height: 36px;
+  padding: 0 0.85rem 0 0.5rem;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--surface-1);
+  color: var(--text-muted);
+  font-size: 0.8125rem;
+  white-space: nowrap;
+  transition: border-color 0.3s ease, color 0.3s ease, background 0.3s ease;
+}
+
+.mission-num {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--surface-3);
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+  font-weight: 650;
+  font-variant-numeric: tabular-nums;
+}
+
+.mission-step.is-active {
+  border-color: color-mix(in srgb, var(--accent) 55%, var(--border));
+  color: var(--text);
+  background: color-mix(in srgb, var(--accent) 8%, var(--surface-1));
+}
+
+.mission-step.is-active .mission-num {
+  background: var(--accent);
+  color: #fff;
+}
+
+.mission-check {
+  display: none;
+  color: var(--good);
+}
+
+.mission-step.is-done {
+  border-color: color-mix(in srgb, var(--good) 45%, var(--border));
+  color: var(--text-secondary);
+}
+
+.mission-step.is-done .mission-num,
+.mission-step.is-done .mission-text {
+  display: none;
+}
+
+.mission-step.is-done .mission-check {
+  display: block;
+}
+
+.mission-step.is-done {
+  padding: 0 0.9rem;
+}
+
+.mission-done {
+  margin-top: 1.25rem;
+  padding: 0.9rem 1.15rem;
+  border-radius: 12px;
+  border: 1px solid color-mix(in srgb, var(--good) 40%, var(--border));
+  background: color-mix(in srgb, var(--good) 6%, var(--surface-1));
+  color: var(--text-secondary);
+  font-size: 0.9375rem;
+}
+
+/* ——— Stage ——— */
+
+.stage {
+  position: relative;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: var(--surface-1);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+.stage-chrome {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.6rem 0.9rem;
+  border-bottom: 1px solid var(--border);
+  background: color-mix(in srgb, var(--surface-2) 70%, transparent);
+}
+
+.chrome-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--surface-3);
+}
+
+.chrome-dot:nth-of-type(1) { background: #f87171; }
+.chrome-dot:nth-of-type(2) { background: #fbbf24; }
+.chrome-dot:nth-of-type(3) { background: #34d399; }
+
+.workspace-pill {
+  margin-left: 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 550;
+  color: var(--accent-soft);
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+  padding: 0.2rem 0.65rem;
+  border-radius: 999px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.stage-tools {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.tool-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  height: 30px;
+  padding: 0 0.6rem;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--surface-1);
+  color: var(--text-secondary);
+  font-size: 0.78rem;
+  transition: color 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+}
+
+.tool-btn:hover {
+  color: var(--text);
+  border-color: var(--border-hover);
+  background: var(--surface-2);
+}
+
+.tool-reset {
+  margin-left: 0.25rem;
+}
+
+/* ——— Canvas ——— */
+
+.canvas-scroll {
+  overflow: auto;
+  overscroll-behavior: contain;
+  max-height: 720px;
+  scrollbar-width: thin;
+}
+
+.canvas-zoom {
+  overflow: hidden;
+}
+
+.canvas {
+  position: relative;
+  width: 1240px;
+  height: 700px;
+  transform-origin: 0 0;
+  background:
+    radial-gradient(circle at 1px 1px, var(--canvas-dot) 1px, transparent 0);
+  background-size: 22px 22px;
+}
+
+.edge-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.edge-svg .flow-edge {
+  fill: none;
+  stroke: var(--edge);
+  stroke-width: 1.75;
+  stroke-linecap: round;
+  marker-end: url(#arrow);
+  transition: stroke 0.2s ease;
+}
+
+.edge-svg .flow-edge.is-hot {
+  stroke: var(--edge-active);
+  stroke-width: 2.25;
+}
+
+.edge-svg .edge-arrow { fill: var(--edge); }
+.edge-svg .flow-edge.is-hot .edge-arrow { fill: var(--edge-active); }
+
+.edge-label {
+  fill: var(--text-secondary);
+  font-size: 10px;
+  font-family: ui-sans-serif, system-ui, sans-serif;
+  paint-order: stroke;
+  stroke: var(--surface-1);
+  stroke-width: 4px;
+  stroke-linejoin: round;
+}
+
+.nodes {
+  position: absolute;
+  inset: 0;
+}
+
+/* ——— Playable node ——— */
+
+.pnode {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  width: 340px;
+  max-height: 460px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--surface-1) 96%, transparent);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.28);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), width 0.25s ease;
+  z-index: 2;
+}
+
+html[data-theme="light"] .pnode {
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.12);
+}
+
+.pnode.is-selected {
+  border-color: color-mix(in srgb, var(--accent) 60%, transparent);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent) 45%, transparent), 0 14px 36px rgba(0, 0, 0, 0.32);
+}
+
+.pnode.is-dragging {
+  cursor: grabbing;
+  transform: scale(1.02);
+  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.4);
+  z-index: 10;
+}
+
+.pnode.is-new {
+  animation: nodeBirth 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes nodeBirth {
+  from { opacity: 0; transform: scale(0.86); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.pnode.is-merged-glow {
+  animation: mergeGlow 1.4s ease-out both;
+}
+
+@keyframes mergeGlow {
+  0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 55%, transparent); }
+  60% { box-shadow: 0 0 0 12px transparent; }
+  100% { box-shadow: 0 12px 32px rgba(0, 0, 0, 0.28); }
+}
+
+.pnode-handle {
+  position: absolute;
+  top: 50%;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  transform: translateY(-50%);
+  cursor: crosshair;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  z-index: 3;
+}
+
+.pnode-handle:hover {
+  transform: translateY(-50%) scale(1.45);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 25%, transparent);
+}
+
+.pnode-handle.left { left: -5px; background: var(--accent); }
+.pnode-handle.right { right: -5px; background: var(--accent-soft); }
+
+.pnode.is-link-target {
+  border-color: var(--good);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--good) 40%, transparent);
+}
+
+.edge-svg .link-ghost {
+  fill: none;
+  stroke: var(--edge-active);
+  stroke-width: 2;
+  stroke-dasharray: 6 5;
+  stroke-linecap: round;
+}
+
+/* Marquee box-selection */
+
+.marquee {
+  position: absolute;
+  border: 1.5px dashed var(--accent-soft);
+  background: color-mix(in srgb, var(--accent) 9%, transparent);
+  border-radius: 6px;
+  pointer-events: none;
+  z-index: 24;
+  animation: popupIn 0.12s ease both;
+}
+
+.marquee.is-done {
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
+/* Copilot badge (AI demo) */
+
+.copilot-badge {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  z-index: 26;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.45rem 0.8rem;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent);
+  background: color-mix(in srgb, var(--accent) 14%, var(--surface-2));
+  color: var(--accent-soft);
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  font-size: 0.72rem;
+  animation: popupIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.copilot-badge .dotpulse {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent-soft);
+  animation: caretBlink 0.8s steps(1) infinite;
+}
+
+.tool-accent {
+  color: var(--accent-soft);
+  border-color: color-mix(in srgb, var(--accent) 40%, transparent);
+  background: color-mix(in srgb, var(--accent) 10%, var(--surface-1));
+}
+
+.tool-accent:hover {
+  color: var(--accent-soft);
+  border-color: color-mix(in srgb, var(--accent) 65%, transparent);
+  background: color-mix(in srgb, var(--accent) 18%, var(--surface-1));
+}
+
+/* Empty-node placeholder */
+
+.pmsg-empty {
+  color: var(--text-muted);
+  font-style: italic;
+  font-size: 0.8125rem;
+  padding: 0.4rem 0.2rem;
+}
+
+/* Node header — mirrors product ChatNodeHeader */
+
+.pnode-head {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.4rem 0.45rem;
+  border-bottom: 1px solid var(--border);
+  border-radius: 11px 11px 0 0;
+  background: var(--surface-2);
+  cursor: grab;
+  user-select: none;
+  touch-action: none;
+}
+
+.pnode.is-collapsed .pnode-head {
+  border-bottom: none;
+  border-radius: 11px;
+  cursor: pointer;
+}
+
+.pnode-head:active {
+  cursor: grabbing;
+}
+
+.pnode-btn {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 7px;
+  color: var(--text-muted);
+  flex-shrink: 0;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.pnode-btn:hover {
+  background: var(--surface-3);
+  color: var(--text);
+}
+
+.pnode-btn.pnode-close:hover {
+  color: var(--bad);
+}
+
+.pnode-btn .chev {
+  transition: transform 0.25s ease;
+}
+
+.pnode.is-collapsed .chev {
+  transform: rotate(-90deg);
+}
+
+.pnode-topic {
+  flex: 1;
+  min-width: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0 0.25rem;
+}
+
+.pnode-topic-pill {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--accent-soft);
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+  padding: 2px 8px;
+  border-radius: 999px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+.pnode[data-color] .pnode-topic-pill {
+  color: var(--node-color);
+  background: color-mix(in srgb, var(--node-color) 12%, transparent);
+}
+
+.pnode-color-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--node-color, var(--accent));
+  flex-shrink: 0;
+}
+
+.pnode.is-collapsed {
+  width: 160px;
+  max-height: none;
+}
+
+.pnode.is-collapsed .pnode-body,
+.pnode.is-collapsed .pnode-input {
+  display: none;
+}
+
+/* Node body & messages — mirrors product ChatMessage */
+
+.pnode-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 0.55rem 0.65rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  scrollbar-width: thin;
+}
+
+.pmsg {
+  font-size: 0.8125rem;
+  line-height: 1.55;
+}
+
+.pmsg-user {
+  align-self: flex-end;
+  max-width: 88%;
+  background: var(--accent);
+  color: #fff;
+  border-radius: 14px 14px 4px 14px;
+  padding: 0.45rem 0.7rem;
+  overflow-wrap: anywhere;
+}
+
+.pmsg-user .pmsg-quote {
+  display: block;
+  margin-top: 0.3rem;
+  padding-left: 0.55rem;
+  border-left: 2px solid rgba(255, 255, 255, 0.45);
+  font-size: 0.75rem;
+  opacity: 0.85;
+  font-style: italic;
+}
+
+.pmsg-bot {
+  color: var(--text);
+  overflow-wrap: anywhere;
+}
+
+.pmsg-bot p { margin: 0 0 0.5rem; }
+.pmsg-bot p:last-child { margin-bottom: 0; }
+.pmsg-bot ul { margin: 0 0 0.5rem; padding-left: 1.1rem; list-style: disc; }
+.pmsg-bot li { margin-bottom: 0.3rem; }
+.pmsg-bot strong { font-weight: 650; }
+.pmsg-bot em { font-style: italic; }
+.pmsg-bot code {
+  background: var(--surface-3);
+  padding: 0.05rem 0.3rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+}
+
+.pmsg-caret {
+  display: inline-block;
+  width: 2px;
+  height: 1em;
+  background: var(--accent-soft);
+  vertical-align: text-bottom;
+  margin-left: 1px;
+  animation: caretBlink 0.8s steps(1) infinite;
+}
+
+@keyframes caretBlink {
+  50% { opacity: 0; }
+}
+
+/* Branchable phrase */
+
+.bphrase {
+  font: inherit;
+  color: inherit;
+  font-weight: 600;
+  border-bottom: 2px dotted color-mix(in srgb, var(--accent-soft) 65%, transparent);
+  cursor: pointer;
+  padding: 0 1px;
+  border-radius: 2px;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.bphrase:hover,
+.bphrase:focus-visible {
+  background: color-mix(in srgb, var(--accent) 14%, transparent);
+  border-bottom-color: var(--accent-soft);
+}
+
+.bphrase.is-used {
+  border-bottom-style: solid;
+  opacity: 0.75;
+  cursor: default;
+}
+
+/* Node input — mirrors product ChatInput */
+
+.pnode-input {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5rem 0.6rem;
+  border-top: 1px solid var(--border);
+}
+
+.pnode-input input {
+  flex: 1;
+  min-width: 0;
+  height: 32px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0 0.6rem;
+  color: var(--text);
+  font-size: 0.8125rem;
+}
+
+.pnode-input input::placeholder {
+  color: var(--text-muted);
+}
+
+.pnode-input input:focus {
+  outline: none;
+  border-color: color-mix(in srgb, var(--accent) 55%, transparent);
+}
+
+.pnode-input .pnode-send {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--accent) 18%, transparent);
+  color: var(--accent-soft);
+  flex-shrink: 0;
+  transition: background 0.15s ease;
+}
+
+.pnode-input .pnode-send:hover {
+  background: color-mix(in srgb, var(--accent) 30%, transparent);
+}
+
+/* Palette popover */
+
+.pnode-palette {
+  position: absolute;
+  top: 42px;
+  right: 8px;
+  z-index: 20;
+  display: flex;
+  gap: 0.4rem;
+  padding: 0.55rem 0.6rem;
+  border: 1px solid var(--border-hover);
+  border-radius: 10px;
+  background: var(--surface-2);
+  box-shadow: var(--shadow);
+}
+
+.pnode-palette button {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  transition: transform 0.15s ease, border-color 0.15s ease;
+}
+
+.pnode-palette button:hover {
+  transform: scale(1.15);
+}
+
+.pnode-palette button.is-on {
+  border-color: var(--text);
+}
+
+/* Delete confirm popover — mirrors product ChatNodeDeleteConfirmation */
+
+.pnode-confirm {
+  position: absolute;
+  top: 42px;
+  right: 8px;
+  z-index: 20;
+  width: 220px;
+  padding: 0.75rem 0.85rem;
+  border: 1px solid var(--border-hover);
+  border-radius: 10px;
+  background: var(--surface-2);
+  box-shadow: var(--shadow);
+  font-size: 0.8125rem;
+}
+
+.pnode-confirm p {
+  margin-bottom: 0.6rem;
+}
+
+.pnode-confirm .confirm-title {
+  font-weight: 650;
+  color: var(--text);
+}
+
+.pnode-confirm .confirm-body {
+  color: var(--text-muted);
+  font-size: 0.75rem;
+}
+
+.confirm-row {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
+.confirm-btn {
+  height: 28px;
+  padding: 0 0.75rem;
+  border-radius: 7px;
+  font-size: 0.78rem;
+  border: 1px solid var(--border-hover);
+  color: var(--text-secondary);
+}
+
+.confirm-btn:hover {
+  color: var(--text);
+}
+
+.confirm-btn.danger {
+  background: var(--bad);
+  border-color: var(--bad);
+  color: #fff;
+}
+
+/* ——— Popups (selection / merge) ——— */
+
+.popup {
+  z-index: 30;
+  border: 1px solid var(--border-hover);
+  border-radius: 10px;
+  background: var(--surface-2);
+  box-shadow: 0 18px 44px rgba(0, 0, 0, 0.45);
+  font-size: 0.8125rem;
+}
+
+html[data-theme="light"] .popup {
+  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.18);
+}
+
+.sel-popup {
+  position: absolute;
+  width: 300px;
+  animation: popupIn 0.2s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes popupIn {
+  from { opacity: 0; transform: translateY(6px) scale(0.97); }
+  to { opacity: 1; transform: none; }
+}
+
+.popup-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.55rem 0.7rem 0.35rem;
+}
+
+.popup-label {
+  font-size: 0.6875rem;
+  color: var(--text-muted);
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.popup-label em {
+  color: var(--text-secondary);
+  font-style: normal;
+}
+
+.popup-x {
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 5px;
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+.popup-x:hover {
+  color: var(--text);
+  background: var(--surface-3);
+}
+
+.popup-row {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0 0.55rem;
+}
+
+.popup-row input {
+  flex: 1;
+  min-width: 0;
+  height: 34px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0 0.6rem;
+  color: var(--text);
+  font-size: 0.8125rem;
+}
+
+.popup-row input::placeholder {
+  color: var(--text-muted);
+}
+
+.popup-row input:focus {
+  outline: none;
+  border-color: color-mix(in srgb, var(--accent) 55%, transparent);
+}
+
+.popup-send {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--accent) 20%, transparent);
+  color: var(--accent-soft);
+  flex-shrink: 0;
+}
+
+.popup-send:hover {
+  background: color-mix(in srgb, var(--accent) 32%, transparent);
+}
+
+.popup-foot {
+  margin-top: 0.45rem;
+  padding: 0.2rem 0.45rem 0.45rem;
+  border-top: 1px solid var(--border);
+  padding-top: 0.35rem;
+}
+
+.popup-explore {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  width: 100%;
+  height: 30px;
+  padding: 0 0.6rem;
+  border-radius: 7px;
+  color: var(--text-secondary);
+  font-size: 0.78rem;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.popup-explore:hover {
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+  color: var(--accent-soft);
+}
+
+/* Merge popup — anchored to stage bottom, mirrors product MergeSelectionPopup */
+
+.merge-popup {
+  position: absolute;
+  bottom: 14px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(400px, calc(100% - 1.5rem));
+  padding-bottom: 0.55rem;
+  animation: popupIn 0.22s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.merge-popup .popup-head {
+  padding-bottom: 0.35rem;
+}
+
+.popup-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.78rem;
+  font-weight: 550;
+  color: var(--text-secondary);
+}
+
+.merge-icon {
+  color: var(--accent-soft);
+}
+
+.merge-topics {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  padding: 0 0.7rem 0.5rem;
+}
+
+.merge-topic {
+  max-width: 150px;
+  font-size: 10px;
+  color: var(--accent-soft);
+  background: color-mix(in srgb, var(--accent) 14%, transparent);
+  border: 1px solid color-mix(in srgb, var(--accent) 22%, transparent);
+  border-radius: 999px;
+  padding: 2px 8px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.merge-chips {
+  display: flex;
+  gap: 0.4rem;
+  padding: 0.5rem 0.7rem 0;
+}
+
+.chip-btn {
+  height: 28px;
+  padding: 0 0.75rem;
+  border-radius: 999px;
+  border: 1px solid var(--border-hover);
+  background: var(--surface-1);
+  color: var(--text-secondary);
+  font-size: 0.78rem;
+  transition: color 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+}
+
+.chip-btn:hover {
+  color: var(--accent-soft);
+  border-color: color-mix(in srgb, var(--accent) 50%, transparent);
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+}
+
+/* Stage hint */
+
+.stage-hint {
+  margin: 0;
+  padding: 0.55rem 0.95rem 0.7rem;
+  border-top: 1px solid var(--border);
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+.stage-hint strong {
+  color: var(--accent-soft);
+  font-weight: 600;
+}
+
+/* ——— Toolbox ——— */
+
+.tool-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 1rem;
+}
+
+.tool-card {
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 1.35rem;
+  background: var(--surface-1);
+  transition: border-color 0.2s ease, transform 0.2s ease;
+}
+
+.tool-card:hover {
+  border-color: var(--border-hover);
+  transform: translateY(-3px);
+}
+
+.tool-wide {
+  grid-column: span 4;
+}
+
+.tool-card:not(.tool-wide) {
+  grid-column: span 2;
+}
+
+.tool-card h3 {
+  font-size: 1rem;
+  font-weight: 650;
+  letter-spacing: -0.015em;
+  margin-bottom: 0.4rem;
+}
+
+.tool-card p {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.tool-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  display: grid;
+  place-items: center;
+  color: var(--accent-soft);
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+  margin-bottom: 0.9rem;
+}
+
+.tool-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 0.85rem;
+}
+
+.tool-chips li {
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  font-size: 0.72rem;
+  color: var(--text-secondary);
+  background: var(--chip-bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0.18rem 0.5rem;
+  white-space: nowrap;
+}
+
+.palette-dots {
+  display: flex;
+  gap: 0.45rem;
+  margin-top: 0.85rem;
+}
+
+.palette-dots span {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--dot);
+}
+
+.mini-code {
+  margin: 0.85rem 0 0.5rem;
+  padding: 0.7rem 0.8rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg);
+  overflow-x: auto;
+}
+
+.mini-code code {
+  font-size: 0.7rem;
+  color: var(--text-secondary);
+  white-space: pre;
+}
+
+/* Demo CTA + facts strip */
+
+.demo-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  height: 38px;
+  padding: 0 1rem;
+  margin-top: 1rem;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent);
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+  color: var(--accent-soft);
+  font-size: 0.85rem;
+  font-weight: 550;
+  transition: background 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
+}
+
+.demo-cta:hover {
+  background: color-mix(in srgb, var(--accent) 22%, transparent);
+  border-color: color-mix(in srgb, var(--accent) 70%, transparent);
+  transform: translateY(-1px);
+}
+
+.tool-strip {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 1.4rem;
+  padding: 0.85rem 1.2rem;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--surface-1);
+  color: var(--text-muted);
+  font-size: 0.8rem;
+}
+
+.tool-strip li {
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  white-space: nowrap;
+}
+
+.tool-strip li::before {
+  content: "·";
+  margin-right: 0.6rem;
+  color: var(--accent-soft);
+}
+
+/* ——— Terminal ——— */
+
+.terminal {
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--surface-1);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+.terminal-chrome {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.6rem 0.9rem;
+  border-bottom: 1px solid var(--border);
+  background: color-mix(in srgb, var(--surface-2) 70%, transparent);
+}
+
+.terminal-title {
+  margin-left: 0.5rem;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+}
+
+.terminal-body {
+  padding: 1rem 1.1rem;
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  font-size: 0.8125rem;
+  line-height: 1.8;
+}
+
+.t-line {
+  opacity: 0;
+}
+
+.t-line.is-on {
+  opacity: 1;
+}
+
+.t-prompt {
+  color: var(--good);
+  font-weight: 600;
+}
+
+.t-cmd {
+  color: var(--text);
+}
+
+.t-out {
+  color: var(--text-muted);
+}
+
+.t-link {
+  color: var(--accent-soft);
+}
+
+.t-comment {
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.quick-note {
+  margin-top: 1rem;
+  font-size: 0.875rem;
+}
+
+/* ——— CTA band ——— */
+
+.cta-band {
+  padding-top: 2rem;
+}
+
+.cta-inner {
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 2.5rem 2rem;
+  background:
+    radial-gradient(ellipse 80% 80% at 10% 0%, color-mix(in srgb, var(--accent) 12%, transparent), transparent 55%),
+    var(--surface-1);
+  text-align: center;
+}
+
+.cta-inner .section-title {
+  max-width: none;
+  margin-inline: auto;
+}
+
+.cta-inner .section-body {
+  margin-inline: auto;
+}
+
+.cta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  justify-content: center;
+  align-items: center;
+}
+
+.clone-box {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-height: 44px;
+  padding: 0.55rem 1rem;
+  border-radius: 999px;
+  border: 1px solid var(--border-hover);
+  background: var(--bg);
+  color: var(--text-secondary);
+  font-size: 0.8125rem;
+  transition: border-color 0.15s ease, color 0.15s ease;
+}
+
+.clone-box:hover {
+  border-color: var(--accent-soft);
+  color: var(--text);
+}
+
+.clone-box code {
+  font-size: 0.78rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: min(70vw, 360px);
+}
+
+.clone-feedback {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  border-radius: inherit;
+  background: color-mix(in srgb, var(--accent) 90%, #000);
+  color: #fff;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+
+.clone-box.is-copied .clone-feedback {
+  opacity: 1;
+}
+
+.clone-box.is-copied {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 45%, transparent);
+}
+
+/* ——— Footer ——— */
+
+.footer {
+  border-top: 1px solid var(--border);
+  padding: 1.75rem 0 2.25rem;
+  margin-top: 2rem;
+}
+
+.footer-inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem 1.5rem;
+}
+
+.footer-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.footer-meta {
+  color: var(--text-muted);
+  font-size: 0.8125rem;
+}
+
+.footer-link {
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+}
+
+.footer-link:hover {
+  color: var(--accent-soft);
+}
+
+/* ——— Entrance & motion ——— */
+
+.enter-nav {
+  animation: navDrop 0.55s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes navDrop {
+  from { opacity: 0; transform: translateY(-14px); }
+  to { opacity: 1; transform: none; }
+}
+
+.enter-item {
+  opacity: 0;
+  transform: translateY(18px);
+  animation: riseIn 0.65s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.enter-item:nth-child(1) { animation-delay: 0.08s; }
+.enter-item:nth-child(2) { animation-delay: 0.16s; }
+.enter-item:nth-child(3) { animation-delay: 0.24s; }
+.enter-item:nth-child(4) { animation-delay: 0.32s; }
+
+@keyframes riseIn {
+  to { opacity: 1; transform: none; }
+}
+
+.hero-title .word {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: bottom;
+  margin-right: 0.28em;
+}
+
+.hero-title .word > span {
+  display: inline-block;
+  transform: translateY(110%);
+  animation: wordUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes wordUp {
+  to { transform: none; }
+}
+
+.enter-stage {
+  opacity: 0;
+  transform: translateY(28px) scale(0.97);
+  animation: stageIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.35s both;
+}
+
+@keyframes stageIn {
+  to { opacity: 1; transform: none; }
+}
+
+/* Directional scroll reveals */
+
+.reveal {
+  opacity: 0;
+  transform: translateY(18px);
+  transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.reveal.is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+.tool-card.reveal:hover {
+  transform: translateY(-3px);
+}
+
+/* Edge draw-on animation */
+
+.flow-edge.is-drawing {
+  transition: stroke-dashoffset 0.55s ease;
+}
+
+/* Magnetic CTA */
+
+.magnetic {
+  will-change: transform;
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease, background 0.2s ease;
+}
+
+/* ——— Reduced motion ——— */
+
+@media (prefers-reduced-motion: reduce) {
+  .enter-nav,
+  .enter-item,
+  .enter-stage,
+  .hero-title .word > span,
+  .pnode.is-new,
+  .sel-popup,
+  .merge-popup {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+
+  .t-line {
+    opacity: 1;
+  }
+
+  .pnode,
+  .tool-card,
+  .magnetic,
+  .pnode-btn,
+  .chip-btn,
+  .flow-edge {
+    transition: none !important;
+  }
+
+  .tool-card.reveal:hover,
+  .pnode.is-dragging {
+    transform: none;
+  }
+
+  .pmsg-caret {
+    animation: none;
+  }
+}
+
+/* ——— Responsive ——— */
+
+@media (max-width: 980px) {
+  .tool-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .tool-wide {
+    grid-column: span 2;
+  }
+
+  .tool-card:not(.tool-wide) {
+    grid-column: span 1;
+  }
+}
+
+@media (max-width: 860px) {
+  .play-head {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .canvas-scroll {
+    max-height: 560px;
+  }
+}
+
+@media (max-width: 640px) {
+  .hero {
+    padding-top: 3rem;
+  }
+
+  .section {
+    padding: 3.5rem 0;
+  }
+
+  .tool-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .tool-wide,
+  .tool-card:not(.tool-wide) {
+    grid-column: auto;
+  }
+
+  .canvas-scroll {
+    max-height: 480px;
+  }
+
+  .pnode {
+    width: 300px;
+  }
+
+  .merge-popup {
+    width: calc(100% - 1rem);
+  }
+
+  .merge-chips {
+    flex-wrap: wrap;
+  }
+
+  .cta-inner {
+    padding: 1.75rem 1.15rem;
+  }
+
+  .clone-box {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .clone-box code {
+    max-width: calc(100vw - 4rem);
+  }
+
+  .footer-inner {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .nav-inner {
+    height: 56px;
+  }
+
+  .brand-name {
+    font-size: 0.95rem;
+  }
+
+  .workspace-pill {
+    max-width: 40vw;
+  }
+}
+  </style>
+  <script>
+    (function () {
+      try {
+        var t = localStorage.getItem('cf-theme');
+        if (t === 'light' || t === 'dark') {
+          document.documentElement.setAttribute('data-theme', t);
+        } else if (window.matchMedia('(prefers-color-scheme: light)').matches) {
+          document.documentElement.setAttribute('data-theme', 'light');
+        } else {
+          document.documentElement.setAttribute('data-theme', 'dark');
+        }
+        var lang = localStorage.getItem('cf-lang');
+        if (lang === 'zh' || lang === 'en') {
+          document.documentElement.lang = lang === 'zh' ? 'zh-CN' : 'en';
+        }
+      } catch (e) {}
+    })();
+  </script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="nav enter-nav">
+    <div class="nav-inner">
+      <a class="brand" href="#" aria-label="CaudalFlow home">
+        <svg class="brand-mark" width="28" height="28" viewBox="0 0 32 32" aria-hidden="true">
+          <rect class="mark-bg" width="32" height="32" rx="6"/>
+          <circle class="mark-accent-soft" cx="10" cy="16" r="3"/>
+          <circle class="mark-accent" cx="22" cy="10" r="2.5"/>
+          <circle class="mark-accent" cx="22" cy="22" r="2.5"/>
+          <line class="mark-edge" x1="12.5" y1="14.5" x2="19.5" y2="10.5" stroke-width="1.5"/>
+          <line class="mark-edge" x1="12.5" y1="17.5" x2="19.5" y2="21.5" stroke-width="1.5"/>
+        </svg>
+        <span class="brand-name">CaudalFlow</span>
+      </a>
+      <div class="nav-actions">
+        <button type="button" class="icon-btn" id="lang-toggle" aria-label="Switch language" title="Language">
+          <span id="lang-label">中文</span>
+        </button>
+        <button type="button" class="icon-btn" id="theme-toggle" aria-label="Toggle theme" title="Theme">
+          <svg id="theme-icon-moon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+          </svg>
+          <svg id="theme-icon-sun" class="hidden" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+          </svg>
+        </button>
+        <a class="btn btn-ghost btn-sm" href="https://github.com/caudal-labs/caudalflow" target="_blank" rel="noopener noreferrer" data-i18n="nav.github">GitHub</a>
+      </div>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="hero">
+      <div class="container hero-inner">
+        <p class="eyebrow enter-item" data-i18n="hero.eyebrow">Open source · Visual AI canvas</p>
+        <h1 class="hero-title enter-item" id="hero-title" data-i18n="hero.title">Every idea deserves a side quest.</h1>
+        <p class="hero-sub enter-item" data-i18n="hero.sub">Branch any conversation, explore in parallel, merge the insights back — on an infinite canvas with an AI copilot that can operate it. The canvas below is real: go ahead, play it.</p>
+        <div class="hero-ctas enter-item">
+          <a class="btn btn-primary magnetic" href="https://github.com/caudal-labs/caudalflow" target="_blank" rel="noopener noreferrer" data-i18n="hero.ctaPrimary">Open GitHub</a>
+          <a class="btn btn-secondary" href="#playground" data-i18n="hero.ctaSecondary">Try the live canvas</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="section playground" id="playground">
+      <div class="container-wide">
+        <div class="play-head">
+          <div class="play-copy">
+            <h2 class="section-title reveal" data-i18n="play.title">Don't read about it. Play it.</h2>
+            <p class="section-body reveal" data-i18n="play.sub">This is a working slice of CaudalFlow, running in mock mode right here on the page.</p>
+          </div>
+          <ol class="mission reveal" id="mission" aria-label="Mission">
+            <li class="mission-step is-active" id="mission-1">
+              <span class="mission-num" aria-hidden="true">1</span>
+              <span class="mission-text" data-i18n="mission.1">Branch from a phrase</span>
+              <svg class="mission-check" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>
+            </li>
+            <li class="mission-step" id="mission-2">
+              <span class="mission-num" aria-hidden="true">2</span>
+              <span class="mission-text" data-i18n="mission.2">Select two nodes</span>
+              <svg class="mission-check" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>
+            </li>
+            <li class="mission-step" id="mission-3">
+              <span class="mission-num" aria-hidden="true">3</span>
+              <span class="mission-text" data-i18n="mission.3">Merge &amp; synthesize</span>
+              <svg class="mission-check" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>
+            </li>
+          </ol>
+        </div>
+
+        <div class="stage enter-stage" id="stage">
+          <div class="stage-chrome">
+            <span class="chrome-dot" aria-hidden="true"></span>
+            <span class="chrome-dot" aria-hidden="true"></span>
+            <span class="chrome-dot" aria-hidden="true"></span>
+            <span class="workspace-pill" id="workspace-pill">Workspace · Landing demo</span>
+            <div class="stage-tools">
+              <button type="button" class="tool-btn tool-accent" id="ai-demo-btn">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9L12 3z"/><path d="M19 15l.6 1.6L21 17l-1.4.4L19 19l-.6-1.6L17 17l1.4-.4L19 15z"/></svg>
+                <span data-i18n="chrome.aiDemo">AI demo</span>
+              </button>
+              <button type="button" class="tool-btn" id="export-btn">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+                <span data-i18n="chrome.export">Export MD</span>
+              </button>
+              <button type="button" class="tool-btn" id="zoom-out" aria-label="Zoom out">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14"/></svg>
+              </button>
+              <button type="button" class="tool-btn" id="zoom-fit" aria-label="Fit view">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M8 3H5a2 2 0 0 0-2 2v3M16 3h3a2 2 0 0 1 2 2v3M8 21H5a2 2 0 0 1-2-2v-3M16 21h3a2 2 0 0 0 2-2v-3"/></svg>
+              </button>
+              <button type="button" class="tool-btn" id="zoom-in" aria-label="Zoom in">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+              </button>
+              <button type="button" class="tool-btn tool-reset" id="reset-btn">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg>
+                <span data-i18n="chrome.replay">Reset</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="canvas-scroll" id="canvas-scroll">
+            <div class="canvas-zoom" id="canvas-zoom">
+              <div class="canvas" id="canvas" role="region" aria-label="Interactive CaudalFlow canvas demo">
+                <svg class="edge-svg" id="edge-svg" width="1240" height="700" viewBox="0 0 1240 700" aria-hidden="true">
+                  <defs>
+                    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+                      <path d="M 0 1.5 L 8 5 L 0 8.5 z" class="edge-arrow"/>
+                    </marker>
+                  </defs>
+                  <g id="edges"></g>
+                </svg>
+                <div class="nodes" id="nodes"></div>
+
+                <div class="popup sel-popup" id="sel-popup" hidden>
+                  <div class="popup-head">
+                    <span class="popup-label"><span data-i18n="sel.label">Selection:</span> <em id="sel-text"></em></span>
+                    <button type="button" class="popup-x" id="sel-close" aria-label="Close">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M18 6L6 18M6 6l12 12"/></svg>
+                    </button>
+                  </div>
+                  <div class="popup-row">
+                    <input type="text" id="sel-input" />
+                    <button type="button" class="popup-send" id="sel-send" aria-label="Send">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                    </button>
+                  </div>
+                  <div class="popup-foot">
+                    <button type="button" class="popup-explore" id="sel-explore">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9L12 3z"/></svg>
+                      <span data-i18n="sel.explore">Explore</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="popup merge-popup" id="merge-popup" hidden>
+            <div class="popup-head">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="merge-icon" aria-hidden="true"><circle cx="18" cy="18" r="3"/><circle cx="6" cy="6" r="3"/><path d="M6 21V9a9 9 0 0 0 9 9"/></svg>
+              <span class="popup-title" id="merge-title">Merge 2 nodes</span>
+            </div>
+            <div class="merge-topics" id="merge-topics"></div>
+            <div class="popup-row">
+              <input type="text" id="merge-input" />
+              <button type="button" class="popup-send" id="merge-send" aria-label="Send">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+              </button>
+            </div>
+            <div class="merge-chips">
+              <button type="button" class="chip-btn" id="chip-compare" data-i18n="merge.compare">Compare</button>
+              <button type="button" class="chip-btn" id="chip-summarize" data-i18n="merge.summarize">Summarize</button>
+              <button type="button" class="chip-btn" id="chip-connections" data-i18n="merge.connections">Connections</button>
+            </div>
+          </div>
+
+          <p class="stage-hint" id="stage-hint" aria-live="polite"></p>
+        </div>
+
+        <p class="mission-done hidden" id="mission-done">
+          <span data-i18n="mission.doneBody">Full loop complete — branch, explore, merge. That's the whole product. Now imagine it with your model, your topics, your canvas.</span>
+          <button type="button" class="link-btn" id="replay-link" data-i18n="mission.reset">Reset playground</button>
+        </p>
+      </div>
+    </section>
+
+    <section class="section toolbox" id="toolbox">
+      <div class="container">
+        <h2 class="section-title reveal" data-i18n="toolbox.title">The loop above is the product. This is the rest of it.</h2>
+        <p class="section-body reveal" data-i18n="toolbox.sub">Everything below is in the repo today — no roadmap asterisks.</p>
+        <div class="tool-grid">
+          <article class="tool-card tool-wide reveal">
+            <div class="tool-icon" aria-hidden="true">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><circle cx="6" cy="6" r="2.5"/><circle cx="18" cy="6" r="2.5"/><circle cx="18" cy="18" r="2.5"/><path d="M8.5 6h5M18 8.5v7M8.2 7.8l7.6 8.4"/></svg>
+            </div>
+            <h3 data-i18n="toolbox.copilotTitle">An AI copilot that operates the canvas</h3>
+            <p data-i18n="toolbox.copilotBody">Not a chat bolted to the side. The agent receives your canvas state — synced every 80 ms — and acts on it through 12 frontend tools:</p>
+            <ul class="tool-chips" aria-label="Agent frontend tools">
+              <li>createChatNode</li><li>createBranchFromNode</li><li>mergeChatNodes</li><li>deleteChatNode</li><li>updateChatNode</li><li>focusChatNode</li><li>appendNodeMessage</li><li>highlightWorkspaceFinding</li><li>renderNodePreview</li><li>renderMergePlan</li><li>renderBranchProposal</li><li>renderChart</li>
+            </ul>
+            <button type="button" class="demo-cta" id="ai-demo-cta">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 4l14 8-14 8V4z"/></svg>
+              <span data-i18n="toolbox.demoCta">Watch the copilot run it</span>
+            </button>
+          </article>
+          <article class="tool-card reveal">
+            <div class="tool-icon" aria-hidden="true">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9l-6-6z"/><path d="M14 3v6h6"/></svg>
+            </div>
+            <h3 data-i18n="toolbox.modelTitle">Bring your own model</h3>
+            <p data-i18n="toolbox.modelBody">Any OpenAI-compatible endpoint — configure and go.</p>
+            <ul class="tool-chips" aria-label="Supported providers">
+              <li>Anthropic</li><li>OpenAI</li><li>DeepSeek</li><li>Groq</li><li>Ollama</li><li>LM Studio</li>
+            </ul>
+          </article>
+          <article class="tool-card reveal">
+            <div class="tool-icon" aria-hidden="true">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M4 7h16M4 12h10M4 17h14"/><circle cx="19" cy="12" r="2"/></svg>
+            </div>
+            <h3 data-i18n="toolbox.exportTitle">Markdown export — try it above</h3>
+            <p data-i18n="toolbox.exportBody">The Export button in the demo canvas produces exactly this file — whole tree, hierarchy intact, ready for docs &amp; panels.</p>
+            <pre class="mini-code" aria-hidden="true"><code># Workspace · Landing demo
+## How should we design auth?
+&gt; merged from: OAuth deep dive + Passkeys
+### Conversation
+**You**: …  **AI**: …</code></pre>
+          </article>
+          <article class="tool-card reveal">
+            <div class="tool-icon" aria-hidden="true">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
+            </div>
+            <h3 data-i18n="toolbox.localTitle">Local-first, key-optional</h3>
+            <p data-i18n="toolbox.localBody">Everything persists to localStorage. Mock mode needs no API key; real keys live in your settings or the optional BFF — never in the repo.</p>
+          </article>
+          <article class="tool-card reveal">
+            <div class="tool-icon" aria-hidden="true">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><circle cx="7.5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="16.5" cy="12" r="1.5"/><path d="M7.5 12H4M20 12h-3.5"/></svg>
+            </div>
+            <h3 data-i18n="toolbox.tagsTitle">Workspaces &amp; color tags</h3>
+            <p data-i18n="toolbox.tagsBody">Organize explorations into workspaces. Tag nodes with colors and labels — the palette above is the real one.</p>
+            <div class="palette-dots" aria-hidden="true">
+              <span style="--dot:#22c55e"></span><span style="--dot:#3b82f6"></span><span style="--dot:#f59e0b"></span><span style="--dot:#ef4444"></span><span style="--dot:#a855f7"></span><span style="--dot:#06b6d4"></span>
+            </div>
+          </article>
+          <ul class="tool-strip reveal" aria-label="Facts">
+            <li>EN · 中文</li>
+            <li>light · dark · system</li>
+            <li>MIT</li>
+            <li>React 19</li>
+            <li>TypeScript</li>
+            <li>@xyflow/react</li>
+            <li>Zustand</li>
+            <li>localStorage persistence</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="section quickstart" id="quickstart">
+      <div class="container">
+        <h2 class="section-title reveal" data-i18n="quick.title">Running in under a minute</h2>
+        <div class="terminal reveal" id="terminal" aria-label="Quick start terminal">
+          <div class="terminal-chrome">
+            <span class="chrome-dot" aria-hidden="true"></span>
+            <span class="chrome-dot" aria-hidden="true"></span>
+            <span class="chrome-dot" aria-hidden="true"></span>
+            <span class="terminal-title">zsh</span>
+          </div>
+          <div class="terminal-body">
+            <div class="t-line"><span class="t-prompt">$</span> <span class="t-cmd">git clone https://github.com/caudal-labs/caudalflow.git</span></div>
+            <div class="t-line"><span class="t-prompt">$</span> <span class="t-cmd">cd caudalflow &amp;&amp; npm install</span></div>
+            <div class="t-line"><span class="t-prompt">$</span> <span class="t-cmd">npm run dev</span></div>
+            <div class="t-line t-out">VITE v8  ready in 412 ms</div>
+            <div class="t-line t-out t-link">➜  Local:  http://localhost:5173/</div>
+            <div class="t-line t-comment" data-i18n="quick.mockNote"># Mock mode — explore the canvas with zero API keys</div>
+          </div>
+        </div>
+        <p class="section-body quick-note reveal" data-i18n="quick.note">Or fork it and import to Vercel — the BFF deploys as a serverless function via vercel.json.</p>
+      </div>
+    </section>
+
+    <section class="section cta-band" id="cta">
+      <div class="container cta-inner">
+        <h2 class="section-title reveal" data-i18n="cta.title">Start branching in minutes.</h2>
+        <p class="section-body reveal" data-i18n="cta.body">Fork, import to Vercel, or run locally — mock mode works with no API key at all.</p>
+        <div class="cta-row reveal">
+          <a class="btn btn-primary magnetic" href="https://github.com/caudal-labs/caudalflow" target="_blank" rel="noopener noreferrer" data-i18n="cta.primary">Get it on GitHub</a>
+          <button type="button" class="clone-box" id="clone-btn" aria-label="Copy clone command">
+            <code id="clone-cmd">git clone https://github.com/caudal-labs/caudalflow.git</code>
+            <span class="clone-feedback" id="clone-feedback" data-i18n="cta.copied" aria-live="polite">Copied</span>
+          </button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-inner">
+      <div class="footer-brand">
+        <svg class="brand-mark" width="20" height="20" viewBox="0 0 32 32" aria-hidden="true">
+          <rect class="mark-bg" width="32" height="32" rx="6"/>
+          <circle class="mark-accent-soft" cx="10" cy="16" r="3"/>
+          <circle class="mark-accent" cx="22" cy="10" r="2.5"/>
+          <circle class="mark-accent" cx="22" cy="22" r="2.5"/>
+          <line class="mark-edge" x1="12.5" y1="14.5" x2="19.5" y2="10.5" stroke-width="1.5"/>
+          <line class="mark-edge" x1="12.5" y1="17.5" x2="19.5" y2="21.5" stroke-width="1.5"/>
+        </svg>
+        <span>CaudalFlow</span>
+      </div>
+      <p class="footer-meta" data-i18n="footer.meta">MIT License · Built for divergent thinking</p>
+      <a class="footer-link" href="https://github.com/caudal-labs/caudalflow" target="_blank" rel="noopener noreferrer" data-i18n="footer.repo">Source on GitHub</a>
+    </div>
+  </footer>
+
+  <script src="./app.js?v=4"></script>
+</body>
+</html>
